@@ -55,10 +55,7 @@ if (changeKafkaPortBtn) {
             portChangeStatus.textContent = "Lütfen bir port girin.";
             return;
         }
-        // Kafka'yı yeni port ile başlatacak komut oluştur
-        const commandToRun = `cd D:/kodlar/aa/kafka_yeni/ ; ./bin/windows/kafka-server-start.bat ./config/server-0.properties --override listeners=SASL_SSL://localhost:${newPort} --override advertised.listeners=SASL_SSL://localhost:${newPort}`;
-        const expectedText = `[KafkaServer id=0] started (kafka.server.KafkaServer)`;
-        ipcRenderer.send("run-kafka", {command:commandToRun,expectedOutput:expectedText});
+        ipcRenderer.send("run-kafka", {port:newPort});
         portChangeStatus.textContent = `Kafka ${newPort} portu ile başlatıldı!`;
     });
 }
