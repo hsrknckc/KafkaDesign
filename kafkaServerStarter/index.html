@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kafka Server</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: #f0f2f5;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #status {font-weight: bold; margin-top: 10px;}
+    .running {color: green;}
+    .checking {color: orange;}
+    .closing {color:darkviolet;}
+    .error {color: red;}
+      /* Login formu merkezde konumlandırmak için */
+    .center-container, #mainContent {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+      box-sizing: border-box;
+    }
+    #loginForm {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 32px 24px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      min-width: 260px;
+      max-width: 90vw;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="center-container" id="loginContainer">
+    <div style="width:100%; max-width:350px;">
+      <h1 style="text-align:center;" id="loginTitle">Giriş Yap</h1>
+      <form id="loginForm">
+        <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+        <input type="password" id="password" placeholder="Şifre" required>
+        <button type="submit">Giriş</button>
+      </form>
+      <div id="loginStatus"></div>
+    </div>
+  </div>
+
+  <div id="mainContent" style="display:none; width:100vw; min-height:100vh; justify-content:center; align-items:center;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap:24px; width:100%; max-width:900px; margin:auto;">
+      <section style="flex:1 1 260px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:20px; min-width:260px; max-width:400px; box-sizing:border-box;">
+        <h2 style="margin-top:0;">Zookeeper</h2>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+          <button id="zookeeperRunBtn">Çalıştır</button>
+          <button id="zookeeperStopBtn">Durdur</button>
+        </div>
+        <div id="zookeeperStatus" style="margin-bottom:8px;">Durum: <span style="font-weight:bold;">kapalı</span></div>
+        <pre id="zookeeperOutput" style="background:#f4f4f4; border-radius:4px; padding:8px; font-size:13px; min-height:40px;max-height: 40px;white-space: pre-wrap;word-break: break-word; overflow-y: hidden;"></pre>
+      </section>
+      <section style="flex:1 1 260px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:20px; min-width:260px; max-width:400px; box-sizing:border-box;">
+        <h2 style="margin-top:0;">Kafka</h2>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+          <button id="kafkaRunBtn">Çalıştır</button>
+          <button id="kafkaStopBtn">Durdur</button>
+        </div>
+        <div id="kafkaStatus" style="margin-bottom:8px;">Durum: <span style="font-weight:bold;">kapalı</span></div>
+        <pre id="kafkaOutput" style="background:#f4f4f4; border-radius:4px; padding:8px; font-size:13px; min-height:40px; max-height: 40px;white-space: pre-wrap;word-break: break-word; overflow-y: hidden;"></pre>
+      </section>
+    </div>
+    <div id="adminPanel" style="display:none; margin:32px auto 0; max-width:400px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:20px;">
+      <h2 style="margin-top:0;">Kafka Portunu Değiştir</h2>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <input type="number" id="kafkaPort" placeholder="Yeni Port" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc;">
+        <button id="changeKafkaPortBtn">Portu Değiştir</button>
+      </div>
+      <div id="portChangeStatus" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
