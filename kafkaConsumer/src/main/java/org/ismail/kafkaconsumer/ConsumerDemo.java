@@ -29,7 +29,6 @@ public class ConsumerDemo {
         while (true) {
             ConsumerRecords<String, String> records = textConsumer.poll(Duration.ofMillis(500));
             for (ConsumerRecord<String, String> record : records) {
-                String type = record.key();
                 log.info(record.value());
                 onMessageReceived.accept(record.value());
             }

@@ -12,7 +12,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 
 public class HelloController {
     @FXML
