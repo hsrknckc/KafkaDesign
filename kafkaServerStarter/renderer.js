@@ -7,6 +7,9 @@ const mainContent = document.getElementById("mainContent");
 const adminPanel = document.getElementById("adminPanel");
 const loginContainer = document.getElementById("loginContainer");
 const loginTitle = document.getElementById("loginTitle");
+const topicsList = document.getElementById("topicsList");
+const usersList = document.getElementById("usersList");
+
 
 let currentUserRole = null;
 
@@ -32,6 +35,7 @@ ipcRenderer.on("login-result", (event, result) => {
             adminPanel.style.display = "block";
         } else {
             adminPanel.style.display = "none";
+            topicsList.style.display="none";
         }
     } else {
         loginStatus.textContent = "Giriş başarısız!";
@@ -39,8 +43,8 @@ ipcRenderer.on("login-result", (event, result) => {
 });
 
 
-ipcRenderer.send("check-kafka");
 ipcRenderer.send("check-zookeeper");
+ipcRenderer.send("check-kafka");
 
 
 // Admin paneli: Kafka portunu değiştirme
@@ -79,23 +83,25 @@ ipcRenderer.on("kafka-output", (event, {status,output}) => {
 
     if(status === "running"){
         kafkaStatusDiv.textContent = "Durum: çalışıyor!!";
-        kafkaStatusDiv.className="running";
-        kafkaRunBtn.disabled=true;
-        changeKafkaPortBtn.disabled=true;
     }else if(status === "checking"){
         kafkaStatusDiv.textContent = "Durum: başlatılıyor";
-        kafkaStatusDiv.className="checking";
     }else if(status === "error"){
         kafkaStatusDiv.textContent = "Durum: hata!!";
-        kafkaStatusDiv.className="error";
     }else if(status === "closing"){
         kafkaStatusDiv.textContent = "Durum: kapanıyor...";
-        kafkaStatusDiv.className="closing"; 
     }else if(status==="completed"){
         kafkaStatusDiv.textContent = "Durum: kapandı!!";
-        kafkaStatusDiv.className="";
-        kafkaRunBtn.disabled=false;
-        changeKafkaPortBtn.disabled=false;   
+    }
+
+    switch (kafkaStatusDiv.textContent){
+        case "Durum: çalışıyor!!":
+            kafkaRunBtn.disabled=true;
+            changeKafkaPortBtn.disabled=true;
+            break;
+        case "Durum: kapandı!!":
+            kafkaRunBtn.disabled=false;
+            changeKafkaPortBtn.disabled=false;
+            break;
     }
 })
 
@@ -115,23 +121,27 @@ ipcRenderer.on("zookeeper-output", (event, {status,output}) => {
 
     if(status === "running"){
         zookeeperStatusDiv.textContent = "Durum: çalışıyor!!";
-        zookeeperStatusDiv.className="running";
-        zookeeperRunBtn.disabled=true;
-        kafkaRunBtn.disabled=false;
-        changeKafkaPortBtn.disabled=false;
     }else if(status === "checking"){
         zookeeperStatusDiv.textContent = "Durum: başlatılıyor";
-        zookeeperStatusDiv.className="checking";
     }else if(status === "error"){
         zookeeperStatusDiv.textContent = "Durum: hata!!";
-        zookeeperStatusDiv.className="error";
     }else if(status==="completed"){
         zookeeperStatusDiv.textContent = "Durum: kapandı!!";
-        zookeeperStatusDiv.className="";
-        zookeeperRunBtn.disabled=false;
-        kafkaRunBtn.disabled=true;
-        changeKafkaPortBtn.disabled=true;
     }
+
+    switch(zookeeperStatusDiv.textContent){
+        case "Durum: çalışıyor!!":
+            zookeeperRunBtn.disabled=true;
+            kafkaRunBtn.disabled=false;
+            changeKafkaPortBtn.disabled=false;
+            break;
+        case "Durum: kapandı!!":
+            zookeeperRunBtn.disabled=false;
+            kafkaRunBtn.disabled=true;
+            changeKafkaPortBtn.disabled=true;
+            break;
+    }
+
 });
 
 const zookeeperStopBtn = document.getElementById("zookeeperStopBtn");
@@ -145,3 +155,27 @@ const kafkaStopBtn = document.getElementById("kafkaStopBtn");
 kafkaStopBtn.addEventListener("click", ()=>{
     ipcRenderer.send("stop-kafka");
 });
+
+
+
+// ipcRenderer.on("list-topics", (event, { output }) => {
+//     topicsList.textContent += output;
+// });
+
+// const refreshTopicsBtn = document.getElementById("refreshTopicsBtn");
+
+// refreshTopicsBtn.addEventListener("click", ()=>{
+//     topicsList.textContent = "Yükleniyor...";
+//     ipcRenderer.send("list-topics");
+// });
+
+// const refreshUsersBtn = document.getElementById("refreshUsersBtn");
+
+// refreshUsersBtn.addEventListener("click", ()=>{
+//     usersList.textContent = "Yükleniyor...";
+//     ipcRenderer.send("list-users");
+// });
+
+// ipcRenderer.on("list-users", (event, { output }) => {
+//     usersList.textContent += output;
+// });

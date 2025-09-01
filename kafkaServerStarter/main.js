@@ -6,6 +6,7 @@ const { spawn } = require("child_process");
 const db = require("./db.js");
 
 const user = {};
+let portNumber = 9092;
 
 /**
  * Creates the main application window.
@@ -20,6 +21,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    autoHideMenuBar: true,
   });
 
   // Load the index.html of the app.
@@ -111,7 +113,7 @@ ipcMain.on("run-zookeeper", (event) => {
   });
 });
 
-ipcMain.on("run-kafka", (event,port) => {
+ipcMain.on("run-kafka", (event, port) => {
   portNumber = port || 9092;
   const runKafkaCommand = `./bin/windows/kafka-server-start.bat ./config/server-0.properties --override listeners=SASL_SSL://localhost:${portNumber} --override advertised.listeners=SASL_SSL://localhost:${portNumber}`;
 
@@ -203,6 +205,7 @@ ipcMain.on("stop-kafka", (event) => {
     const zk = spawn("powershell.exe", ["-Command", zkDeleteCommand], {
       cwd: "D:/kodlar/aa/kafka_yeni/",
     });
+
     zk.stdout.on("data", (data) => {
       event.sender.send("kafka-output", {
         output: `kafkanın zookeeper node'u siliniyor`,
@@ -260,3 +263,80 @@ ipcMain.on("stop-zookeeper", (event) => {
     });
   });
 });
+
+// ipcMain.on("create-topic", (event,{topicName}) => {
+//   const createTopicCommand = `$env:KAFKA_HEAP_OPTS='-Xmx1G'; .\\bin\\windows\\kafka-topics.bat --create --topic ${topicName} --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties`;
+//   const ps = spawn("powershell.exe", ["-Command", createTopicCommand], {
+//     cwd: "D:/kodlar/aa/kafka_yeni/",
+//   });
+
+//   ps.stderr.on("data", (data) => {
+//     console.error(`ps hatası: ${data}`);
+//   });
+
+//   ps.on("close", (code) => {
+//     console.log(`child proc exit ${code}`);
+//     event.sender.send("kafka-output", {
+//       output: `Topic '${topicName}' başarıyla oluşturuldu`,
+//     });
+//   });
+// });
+
+// ipcMain.on("list-topics",(event)=>{
+//   const listTopicsCommand=`.\\bin\\windows\\kafka-topics.bat --list --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties`;
+//   const ps = spawn("powershell.exe", ["-Command", listTopicsCommand], {
+//     cwd: "D:/kodlar/aa/kafka_yeni/",
+//   });
+//   event.sender.send("list-topics", {
+//     output: `Topicler listeleniyor \n`,
+//   });
+//   ps.stdout.on("data", (data) => {
+//     event.sender.send("list-topics", {
+//       output: `${data}`,
+//     });
+//   });
+//   ps.stderr.on("data", (data) => {
+//     console.error(`ps hatası: ${data}`);
+//   });
+//   ps.on("close", (code) => {
+//     console.log(`child proc exit ${code}`);
+//     event.sender.send("list-topics", {
+//       output: `Topicler listelendi`,
+//     });
+//   });
+// });
+
+// ipcMain.on("list-users",(event)=>{
+//   const listUsersCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --describe`;
+//   const ps = spawn("powershell.exe", ["-Command", listUsersCommand], {
+//     cwd: "D:/kodlar/aa/kafka_yeni/",
+//   });
+//   event.sender.send("list-users", {
+//     output: `Kullanıcılar listeleniyor \n`,
+//   });
+//   ps.stdout.on("data", (data) => {
+//     event.sender.send("list-users", {
+//       output: `${data}`,
+//     });
+//   });
+//   ps.stderr.on("data", (data) => {
+//     console.error(`ps hatası: ${data}`);
+//   });
+//   ps.on("close", (code) => {
+//     console.log(`child proc exit ${code}`);
+//     event.sender.send("list-users", {
+//       output: `Kullanıcılar listelendi`,
+//     });
+//   });
+// });
+
+// ipcMain.on("create-user",(event, {username,password})=>{
+//   const createUserCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --entity-name sasl-consumer --alter --add-config 'SCRAM-SHA-512=[password=Bro123]'`;
+
+// });
+
+// ipcMain.on("delete-user",(event, {username})=>{
+//   const deleteUserCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --entity-name sasl-consumer --alter --delete-config 'SCRAM-SHA-512'`;
+
+// });
+

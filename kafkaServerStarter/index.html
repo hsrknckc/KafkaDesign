@@ -1,68 +1,137 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kafka Server</title>
     <style>
       body {
-        font-family: sans-serif;
+        font-family: "Segoe UI", Tahoma, sans-serif;
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        background: #7bb08c;
-        box-sizing: border-box;
+        background: linear-gradient(135deg, #7bb08c, #4a8061);
         display: flex;
         justify-content: center;
         align-items: center;
       }
-      #status {
-        font-weight: bold;
-        margin-top: 10px;
+
+      .container {
+        width: 100%;
+        max-width: 1000px;
+        padding: 20px;
       }
-      .running {
-        color: green;
+
+      /* Login */
+      .login-card {
+        max-width: 360px;
+        margin: auto;
+        background: #fff;
+        padding: 32px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
-      .checking {
-        color: orange;
+
+      .login-card h1 {
+        text-align: center;
+        margin-bottom: 16px;
       }
-      .closing {
-        color: darkviolet;
-      }
-      .error {
-        color: red;
-      }
-      /* Login formu merkezde konumlandırmak için */
-      .center-container,
-      #mainContent {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        width: 100vw;
-        box-sizing: border-box;
-        padding: 10px;
-      }
-      #loginForm {
+
+      .login-card form {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        padding: 32px 24px;
+        gap: 12px;
+      }
+
+      .login-card input,
+      .login-card button {
+        padding: 10px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .login-card input {
         border: 1px solid #ccc;
-        border-radius: 8px;
-        background: #fafafa;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        min-width: 260px;
-        max-width: 90vw;
-        width: 100%;
-        box-sizing: border-box;
+      }
+
+      .login-card button {
+        border: none;
+        background: #4a8061;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Grid layout */
+      #mainContent {
+        display: none;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+
+      .card button {
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: none;
+        background: #4a8061;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        margin-right: 8px;
+      }
+
+      button:hover {
+        background: #325742;
+        transition: all 0.3s ease;
+      }
+
+      .status {
+        margin: 10px 0;
+        font-weight: bold;
+      }
+
+      pre {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 8px;
+        font-size: 13px;
+        min-height: 50px;
+        max-height: 50px;
+        overflow-y: hidden;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      button:disabled {
+        background: #b0b0b0;
+        cursor: not-allowed;
+        opacity: 0.7;
+        transform: none; /* aktifmiş gibi küçülmesin */
       }
     </style>
   </head>
   <body>
-    <div class="center-container" id="loginContainer">
-      <div style="width: 100%; max-width: 350px">
-        <h1 style="text-align: center" id="loginTitle">Giriş Yap</h1>
+    <!-- Login ekranı -->
+    <div id="loginContainer" class="container">
+      <div class="login-card">
+        <h1>Giriş Yap</h1>
         <form id="loginForm">
           <input
             type="text"
@@ -77,128 +146,64 @@
       </div>
     </div>
 
-    <div
-      id="mainContent"
-      style="
-        display: none;
-        width: 100vw;
-        min-height: 100vh;
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <div
-        style="
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 24px;
-          width: 100%;
-          max-width: 900px;
-          margin: auto;
-        "
-      >
-        <section
-          style="
-            flex: 1 1 260px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            padding: 20px;
-            min-width: 260px;
-            max-width: 400px;
-            box-sizing: border-box;
-          "
-        >
-          <h2 style="margin-top: 0">Zookeeper</h2>
-          <div style="display: flex; gap: 10px; margin-bottom: 10px">
+    <!-- Ana içerik -->
+    <div id="mainContent" class="container">
+      <div class="grid">
+        <!-- Zookeeper -->
+        <section class="card">
+          <h2>Zookeeper</h2>
+          <div>
             <button id="zookeeperRunBtn">Çalıştır</button>
             <button id="zookeeperStopBtn">Durdur</button>
           </div>
-          <div id="zookeeperStatus" style="margin-bottom: 8px">
-            Durum: <span style="font-weight: bold">kapalı</span>
+          <div id="zookeeperStatus" class="status">
+            Durum: <span>kapalı</span>
           </div>
-          <pre
-            id="zookeeperOutput"
-            style="
-              background: #f4f4f4;
-              border: 1px solid black;
-              border-radius: 4px;
-              padding: 8px;
-              font-size: 13px;
-              min-height: 40px;
-              max-height: 40px;
-              white-space: pre-wrap;
-              word-break: break-word;
-              overflow-y: hidden;
-            "
-          ></pre>
+          <pre id="zookeeperOutput"></pre>
         </section>
-        <section
-          style="
-            flex: 1 1 260px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            padding: 20px;
-            min-width: 260px;
-            max-width: 400px;
-            box-sizing: border-box;
-          "
-        >
-          <h2 style="margin-top: 0">Kafka</h2>
-          <div style="display: flex; gap: 10px; margin-bottom: 10px">
+
+        <!-- Kafka -->
+        <section class="card">
+          <h2>Kafka</h2>
+          <div>
             <button id="kafkaRunBtn">Çalıştır</button>
             <button id="kafkaStopBtn">Durdur</button>
           </div>
-          <div id="kafkaStatus" style="margin-bottom: 8px">
-            Durum: <span style="font-weight: bold">kapalı</span>
-          </div>
-          <pre
-            id="kafkaOutput"
-            style="
-              background: #f4f4f4;
-              border: 1px solid black;
-              border-radius: 4px;
-              padding: 8px;
-              font-size: 13px;
-              min-height: 40px;
-              max-height: 40px;
-              white-space: pre-wrap;
-              word-break: break-word;
-              overflow-y: hidden;
-            "
-          ></pre>
+          <div id="kafkaStatus" class="status">Durum: <span>kapalı</span></div>
+          <pre id="kafkaOutput"></pre>
         </section>
-      </div>
-      <div
-        id="adminPanel"
-        style="
-          display: none;
-          margin: 32px auto 0;
-          max-width: 400px;
-          background: #fff;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-          padding: 20px;
-        "
-      >
-        <h2 style="margin-top: 0">Kafka Portunu Değiştir</h2>
-        <div style="display: flex; gap: 10px; align-items: center">
-          <input
-            type="number"
-            id="kafkaPort"
-            placeholder="Yeni Port"
-            style="
-              flex: 1;
-              padding: 8px;
-              border-radius: 4px;
-              border: 1px solid #ccc;
-            "
-          />
-          <button id="changeKafkaPortBtn">Portu Değiştir</button>
-        </div>
-        <div id="portChangeStatus" style="margin-top: 8px"></div>
+
+        <!-- Admin Panel -->
+        <section id="adminPanel" class="card">
+          <h2>Kafka Portunu Değiştir</h2>
+          <div style="display: flex; gap: 10px">
+            <input
+              type="number"
+              id="kafkaPort"
+              placeholder="Yeni Port"
+              style="
+                flex: 1;
+                background: #f9f9f9;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 8px;
+              "
+            />
+            <button id="changeKafkaPortBtn">Değiştir</button>
+          </div>
+          <div id="portChangeStatus"></div>
+        </section>
+        <!-- 
+        
+        <section class="card">
+          <h2>Topicler <button id="refreshTopicsBtn">Yenile</button></h2>
+          <pre id="topicsList"></pre>
+        </section>
+     
+        <section class="card">
+          <h2>Kullanıcılar <button id="refreshUsersBtn">Yenile</button></h2>
+          <pre id="usersList"></pre>
+        </section> -->
       </div>
     </div>
 
