@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.*;
 
 import java.io.ByteArrayInputStream;
 
@@ -28,7 +29,7 @@ public class HelloController {
     String fileType = "";
     @FXML
     public void initialize(){
-        myComboBox.getItems().addAll("text","image");
+        myComboBox.getItems().addAll("text","image","audio");
         myComboBox.setOnAction(event -> {
             fileType = myComboBox.getValue();
         });
@@ -76,6 +77,30 @@ public class HelloController {
             Thread thread2 = new Thread(kafkaTask2);
             thread2.setDaemon(true);
             thread2.start();
+        } else if (fileType.equals("audio")) {
+            Task<Void> kafkaTask3 = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    consumerDemo.readFileMessages(topicName, message -> {
+                        Platform.runLater(() -> {
+                            try{
+                                String tempFile="temp_audio.mp3";
+                                Files.write(Paths.get(tempFile), message);
+                                Media media = new Media(new File(tempFile).toURI().toString());
+                                MediaPlayer mediaPlayer = new MediaPlayer(media);
+                                mediaPlayer.play();
+                            }catch (IOException e){
+                                e.printStackTrace();
+                            }
+                        });
+                    });
+                    return null;
+                }
+            };
+            Thread thread3 = new Thread(kafkaTask3);
+            thread3.setDaemon(true);
+            thread3.start();
+
         }
     }
 }

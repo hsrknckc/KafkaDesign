@@ -13,6 +13,9 @@ module org.ismail.kafkaProducer {
     requires kafka.clients;
     requires org.slf4j;
     requires java.desktop;
+    requires annotations;
+    requires org.json;
+    requires com.fasterxml.jackson.databind;
 
     opens org.ismail.kafkaProducer to javafx.fxml;
     exports org.ismail.kafkaProducer;
