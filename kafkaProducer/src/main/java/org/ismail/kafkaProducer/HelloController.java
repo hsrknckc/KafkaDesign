@@ -1,6 +1,9 @@
 package org.ismail.kafkaProducer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -8,6 +11,11 @@ import javafx.scene.layout.VBox;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import org.ismail.kafkaProducer.utils.Utilities;
+
+import java.beans.EventHandler;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,43 +30,46 @@ public class HelloController {
     @FXML private Label status1;
     @FXML private Label status2;
 
+    private FileChooser fileChooser = new FileChooser();
+
     private final ProducerDemo producerDemo = new ProducerDemo();
 
     // Bölüm 1
     @FXML
-    protected void sendString() {
+    protected void sendString() throws JsonProcessingException {
         String topic = topicName.getText();
         String msg = message.getText();
         producerDemo.sendStringMessage(topic,msg);
         status1.setText("Gönderildi!");
     }
 
+    File fileToSend;
     // Bölüm 2
     @FXML
     protected void sendFile() throws IOException {
         String topic = topicName2.getText();
-        String path = message2.getText();
+        String path = fileToSend.getAbsolutePath();
         producerDemo.sendFileMessage(topic,path);
         status2.setText("Gönderildi!");
     }
 
-
-    // Bölüm 3
     @FXML
-    protected void previewFile() throws IOException {
-        String path = message2.getText();
-        String fileType = producerDemo.getFileType(path);
+    protected void selectFile() throws IOException {
+        fileToSend = fileChooser.showOpenDialog(null);
+        String fileType = Utilities.getFileType(fileToSend.getAbsolutePath());
         previewBox.getChildren().clear();
+        TextArea fileTypeLabel = new TextArea("Dosya tipi: " + fileType);
+        fileTypeLabel.setEditable(false);
+        previewBox.getChildren().add(fileTypeLabel);
         switch (fileType) {
             case "text":
-                String content = Files.readString(Path.of(path));
-                TextArea textArea = new TextArea(content);
+                TextArea textArea = new TextArea(fileToSend.toString());
                 textArea.setEditable(false);
                 previewBox.getChildren().add(textArea);
                 break;
 
             case "image":
-                Image image = new Image(new FileInputStream(path));
+                Image image = new Image(new FileInputStream(fileToSend));
                 ImageView imageView = new ImageView(image);
                 imageView.setFitWidth(600);
                 imageView.setPreserveRatio(true);
@@ -73,4 +84,5 @@ public class HelloController {
 
         }
     }
+
 }

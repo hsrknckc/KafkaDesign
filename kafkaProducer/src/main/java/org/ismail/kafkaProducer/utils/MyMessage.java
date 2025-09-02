@@ -1,19 +1,32 @@
 package org.ismail.kafkaProducer.utils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Arrays;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE,
+        getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY,
+        setterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY,
+        isGetterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
 public class MyMessage {
-    public LocalDateTime time;
-    public String dataType;
-    public byte[] data;
-    public String textData;
-    public String producer;
-    public String topic;
-    public String dataPath;
+    private String name;
+    private LocalDateTime time;
+    private String dataType;
+    private byte[] data;
+    private String textData;
+    private String producer;
+    private String topic;
+    private String dataPath;
 
 
-    public MyMessage(LocalDateTime time, String dataType, byte[] data, String producer, String topic) {
+    public MyMessage() {}
+
+    public MyMessage(String name,LocalDateTime time, String dataType, byte[] data, String producer, String topic) {
+        this.name = name;
         this.time = time;
         this.dataType = dataType;
         this.data = data;
@@ -21,7 +34,8 @@ public class MyMessage {
         this.topic = topic;
     }
 
-    public MyMessage(LocalDateTime time, String dataType, String dataPath, String producer, String topic) {
+    public MyMessage(String name ,LocalDateTime time, String dataType, String dataPath, String producer, String topic) {
+        this.name = name;
         this.time = time;
         this.dataType = dataType;
         this.dataPath = dataPath;
@@ -29,7 +43,8 @@ public class MyMessage {
         this.topic = topic;
     }
 
-    public MyMessage(LocalDateTime time, String textData, String producer, String topic) {
+    public MyMessage(String name, LocalDateTime time, String textData, String producer, String topic) {
+        this.name = name;
         this.time = time;
         this.dataType = "string";
         this.textData = textData;
@@ -37,14 +52,7 @@ public class MyMessage {
         this.topic = topic;
     }
 
-    public String getDataPath() {
-        return dataPath;
-    }
-
-    public void setDataPath(String dataPath) {
-        this.dataPath = dataPath;
-    }
-
+    @JsonProperty("time")
     public LocalDateTime getTime() {
         return time;
     }
@@ -53,6 +61,7 @@ public class MyMessage {
         this.time = time;
     }
 
+    @JsonProperty("dataType")
     public String getDataType() {
         return dataType;
     }
@@ -61,6 +70,7 @@ public class MyMessage {
         this.dataType = dataType;
     }
 
+    @JsonProperty("data")
     public byte[] getData() {
         return data;
     }
@@ -69,6 +79,25 @@ public class MyMessage {
         this.data = data;
     }
 
+    @JsonProperty("textData")
+    public String getTextData() {
+        return textData;
+    }
+
+    public void setTextData(String textData) {
+        this.textData = textData;
+    }
+
+    @JsonProperty("dataPath")
+    public String getDataPath() {
+        return dataPath;
+    }
+
+    public void setDataPath(String dataPath) {
+        this.dataPath = dataPath;
+    }
+
+    @JsonProperty("producer")
     public String getProducer() {
         return producer;
     }
@@ -77,6 +106,7 @@ public class MyMessage {
         this.producer = producer;
     }
 
+    @JsonProperty("topic")
     public String getTopic() {
         return topic;
     }
@@ -85,5 +115,26 @@ public class MyMessage {
         this.topic = topic;
     }
 
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "MyMessage{" +
+                "name='" + name + '\'' +
+                "time=" + time +
+                ", dataType='" + dataType + '\'' +
+                ", data=" + "..." + '\'' +
+                ", textData='" + textData + '\'' +
+                ", producer='" + producer + '\'' +
+                ", topic='" + topic + '\'' +
+                ", dataPath='" + dataPath + '\'' +
+                '}';
+    }
 }

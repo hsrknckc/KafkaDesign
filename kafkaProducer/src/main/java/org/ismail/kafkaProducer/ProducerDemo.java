@@ -1,31 +1,40 @@
 package org.ismail.kafkaProducer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.ismail.kafkaProducer.configs.ProducerProperties;
+import org.ismail.kafkaProducer.utils.JsonUtil;
+import org.ismail.kafkaProducer.utils.MyMessage;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+
+import static org.ismail.kafkaProducer.utils.Utilities.getFileType;
 
 public class ProducerDemo {
     private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class);
-    private final KafkaProducer<String, String> textProducer;
     private final KafkaProducer<String, byte[]> fileProducer;
 
     public ProducerDemo() {
         ProducerProperties producerProperties = new ProducerProperties();
-
-        this.textProducer = new KafkaProducer<>(producerProperties.textProperties);
         this.fileProducer = new KafkaProducer<>(producerProperties.fileProperties);
     }
 
-    public void sendStringMessage(String topicName, String message) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topicName,"text", message);
-        textProducer.send(record, (recordMetadata, e) -> {
+    public void sendStringMessage(String topicName, String msg) throws JsonProcessingException {
+        MyMessage message = new MyMessage("str",LocalDateTime.now(),msg,"sasl-producer",topicName);
+        String jsonString=JsonUtil.mapper().writeValueAsString(message);
+        System.out.println(message);
+        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName, jsonString.getBytes(StandardCharsets.UTF_8));
+        fileProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
                 log.error("Send failed", e);
             } else {
@@ -34,22 +43,16 @@ public class ProducerDemo {
         });
     }
 
-    public String getFileType(String filePath) throws IOException {
-        Path path= Paths.get(filePath);
-        String mimeType = Files.probeContentType(path);
-
-        if(mimeType==null) return "bilinmeyen dosya tipi";
-
-        if(mimeType.startsWith("text") ) return "text";
-        else if(mimeType.startsWith("image") ) return "image";
-        else if(mimeType.startsWith("pdf") ) return "pdf";
-        else return "desteklenmeyen dosya tipi";
-    }
 
     public void sendFileMessage(String topicName, String filePath) throws IOException {
+        File file = new File(filePath);
         byte[] fileBytes= Files.readAllBytes(Paths.get(filePath));
         String mimeType = getFileType(filePath);
-        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName,mimeType,fileBytes);
+
+        MyMessage message = new MyMessage(file.getName(),LocalDateTime.now(),mimeType,fileBytes,"sasl-producer",topicName);
+        String jsonString = JsonUtil.mapper().writeValueAsString(message);
+        System.out.println(message);
+        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName,jsonString.getBytes(StandardCharsets.UTF_8));
         fileProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
                 log.error("Send failed", e);
@@ -60,8 +63,8 @@ public class ProducerDemo {
     }
 
     public void close() {
-        textProducer.flush();
-        textProducer.close();
+        fileProducer.flush();
+        fileProducer.close();
     }
 }
 

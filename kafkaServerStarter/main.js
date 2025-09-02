@@ -4,6 +4,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn } = require("child_process");
 
 const db = require("./db.js");
+const kafkaDir = "../k/";
 
 const user = {};
 let portNumber = 9092;
@@ -78,7 +79,7 @@ ipcMain.on("run-zookeeper", (event) => {
   const runZookeeperCommand =
     "./bin/windows/zookeeper-server-start.bat ./config/zookeeper.properties";
   const ps = spawn("powershell.exe", ["-Command", runZookeeperCommand], {
-    cwd: "D:/kodlar/aa/kafka_yeni/",
+    cwd: kafkaDir,
   });
 
   const expectedOutput = "INFO Created server with tickTime";
@@ -118,7 +119,7 @@ ipcMain.on("run-kafka", (event, port) => {
   const runKafkaCommand = `./bin/windows/kafka-server-start.bat ./config/server-0.properties --override listeners=SASL_SSL://localhost:${portNumber} --override advertised.listeners=SASL_SSL://localhost:${portNumber}`;
 
   const ps = spawn("powershell.exe", ["-Command", runKafkaCommand], {
-    cwd: "D:/kodlar/aa/kafka_yeni/",
+    cwd: kafkaDir,
   });
 
   const expectedOutput =
@@ -185,7 +186,7 @@ ipcMain.on("check-zookeeper", (event) => {
 ipcMain.on("stop-kafka", (event) => {
   const kafkaStopCommand = "./bin/windows/kafka-server-stop.bat";
   const ps = spawn("powershell.exe", ["-Command", kafkaStopCommand], {
-    cwd: "D:/kodlar/aa/kafka_yeni/",
+    cwd: kafkaDir,
   });
 
   event.sender.send("kafka-output", {
@@ -203,7 +204,7 @@ ipcMain.on("stop-kafka", (event) => {
       "./bin/windows/zookeeper-shell.bat localhost:2182 -zk-tls-config-file ./config/zookeeper-client.properties delete /brokers/ids/0";
 
     const zk = spawn("powershell.exe", ["-Command", zkDeleteCommand], {
-      cwd: "D:/kodlar/aa/kafka_yeni/",
+      cwd: kafkaDir,
     });
 
     zk.stdout.on("data", (data) => {
@@ -229,7 +230,7 @@ ipcMain.on("stop-zookeeper", (event) => {
     "./bin/windows/zookeeper-shell.bat localhost:2182 -zk-tls-config-file ./config/zookeeper-client.properties delete /brokers/ids/0";
 
   const zk = spawn("powershell.exe", ["-Command", zkDeleteCommand], {
-    cwd: "D:/kodlar/aa/kafka_yeni/",
+    cwd: kafkaDir,
   });
   zk.stdout.on("data", (data) => {
     event.sender.send("zookeeper-output", {
@@ -243,7 +244,7 @@ ipcMain.on("stop-zookeeper", (event) => {
     console.log("kafka zk node silindi ");
     const zookeeperStopCommand = "./bin/windows/zookeeper-server-stop.bat";
     const ps = spawn("powershell.exe", ["-Command", zookeeperStopCommand], {
-      cwd: "D:/kodlar/aa/kafka_yeni/",
+      cwd: kafkaDir,
     });
 
     ps.stderr.on("data", (data) => {
@@ -267,7 +268,7 @@ ipcMain.on("stop-zookeeper", (event) => {
 // ipcMain.on("create-topic", (event,{topicName}) => {
 //   const createTopicCommand = `$env:KAFKA_HEAP_OPTS='-Xmx1G'; .\\bin\\windows\\kafka-topics.bat --create --topic ${topicName} --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties`;
 //   const ps = spawn("powershell.exe", ["-Command", createTopicCommand], {
-//     cwd: "D:/kodlar/aa/kafka_yeni/",
+//     cwd: kafkaDir,
 //   });
 
 //   ps.stderr.on("data", (data) => {
@@ -285,7 +286,7 @@ ipcMain.on("stop-zookeeper", (event) => {
 // ipcMain.on("list-topics",(event)=>{
 //   const listTopicsCommand=`.\\bin\\windows\\kafka-topics.bat --list --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties`;
 //   const ps = spawn("powershell.exe", ["-Command", listTopicsCommand], {
-//     cwd: "D:/kodlar/aa/kafka_yeni/",
+//     cwd: kafkaDir,
 //   });
 //   event.sender.send("list-topics", {
 //     output: `Topicler listeleniyor \n`,
@@ -309,7 +310,7 @@ ipcMain.on("stop-zookeeper", (event) => {
 // ipcMain.on("list-users",(event)=>{
 //   const listUsersCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --describe`;
 //   const ps = spawn("powershell.exe", ["-Command", listUsersCommand], {
-//     cwd: "D:/kodlar/aa/kafka_yeni/",
+//     cwd: kafkaDir,
 //   });
 //   event.sender.send("list-users", {
 //     output: `Kullanıcılar listeleniyor \n`,

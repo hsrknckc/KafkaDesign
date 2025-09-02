@@ -12,7 +12,7 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
 
         HelloController controller = new HelloController();
-        Scene scene = new Scene(fxmlLoader.load(), 900, 600);
+        Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Kafka Consumer Client");
         stage.setScene(scene);
         stage.setOnCloseRequest(event ->{

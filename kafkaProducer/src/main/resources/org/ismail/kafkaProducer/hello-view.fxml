@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<VBox alignment="CENTER" prefHeight="513.0" prefWidth="900"
-      style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);"
-      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.ismail.kafkaProducer.HelloController">
+<VBox alignment="CENTER" prefHeight="300.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ismail.kafkaProducer.HelloController">
     <stylesheets>
-        <URL value="@style.css"/>
+        <URL value="@style.css" />
     </stylesheets>
-    <HBox spacing="20" alignment="CENTER">
+    <HBox alignment="CENTER" spacing="20">
         <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
+            <Insets bottom="20" left="20" right="20" top="20" />
         </padding>
 
         <!-- Sol kolon -->
@@ -26,7 +23,7 @@
                 <TextField fx:id="topicName" promptText="Topic adını gir..." />
                 <TextField fx:id="message" promptText="Mesajını gir..." />
                 <HBox alignment="CENTER" spacing="10">
-                    <Button fx:id="sendString" styleClass="start-btn" text="Gönder" onAction="#sendString" />
+                    <Button fx:id="sendString" onAction="#sendString" styleClass="start-btn" text="Gönder" />
                 </HBox>
                 <Label fx:id="status1"> </Label>
             </VBox>
@@ -35,10 +32,9 @@
             <VBox alignment="CENTER" spacing="10" styleClass="card" VBox.vgrow="ALWAYS">
                 <Label styleClass="card-title" text="Dosya gönder" />
                 <TextField fx:id="topicName2" promptText="Topic adını gir..." />
-                <TextField fx:id="message2" promptText="Dosya yolunu gir..." />
+            <Button fx:id="selectFile" onAction="#selectFile" mnemonicParsing="false" style="-fx-background-color: orange;" styleClass="start-btn" text="Dosya Seç" />
                 <HBox alignment="CENTER" spacing="10">
-                    <Button fx:id="previewFile" styleClass="start-btn" text="Önizleme" onAction="#previewFile" />
-                    <Button fx:id="sendFile" styleClass="start-btn" text="Gönder" onAction="#sendFile" />
+                    <Button fx:id="sendFile" onAction="#sendFile" styleClass="start-btn" text="Gönder" />
                 </HBox>
                 <Label fx:id="status2"> </Label>
             </VBox>
@@ -46,7 +42,7 @@
         </VBox>
 
         <!-- Sağ kolon: Önizleme -->
-        <VBox spacing="10" styleClass="card" VBox.vgrow="ALWAYS" alignment="TOP_CENTER" prefWidth="600">
+        <VBox alignment="TOP_CENTER" prefHeight="218.0" prefWidth="309.0" spacing="10" styleClass="card" VBox.vgrow="ALWAYS">
             <Label styleClass="card-title" text="Dosya önizle" />
             <VBox fx:id="previewBox"> </VBox>
         </VBox>
