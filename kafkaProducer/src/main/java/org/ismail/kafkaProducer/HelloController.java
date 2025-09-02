@@ -1,30 +1,23 @@
 package org.ismail.kafkaProducer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.ismail.kafkaProducer.utils.Utilities;
 
-import java.beans.EventHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class HelloController {
     @FXML private TextField topicName;
     @FXML private TextField topicName2;
-    @FXML private TextField message2;
     @FXML private TextField message;
     @FXML private VBox previewBox;
     @FXML private Label status1;

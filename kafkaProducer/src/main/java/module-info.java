@@ -13,7 +13,7 @@ module org.ismail.kafkaProducer {
     requires kafka.clients;
     requires org.slf4j;
     requires java.desktop;
-    requires annotations;
+    requires org.jetbrains.annotations;
     requires org.json;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;

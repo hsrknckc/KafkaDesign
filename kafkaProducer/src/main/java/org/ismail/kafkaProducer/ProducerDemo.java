@@ -1,13 +1,11 @@
 package org.ismail.kafkaProducer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.ismail.kafkaProducer.configs.ProducerProperties;
 import org.ismail.kafkaProducer.utils.JsonUtil;
 import org.ismail.kafkaProducer.utils.MyMessage;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
