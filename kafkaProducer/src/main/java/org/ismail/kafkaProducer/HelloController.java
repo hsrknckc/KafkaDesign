@@ -23,7 +23,7 @@ public class HelloController {
     @FXML private Label status1;
     @FXML private Label status2;
 
-    private FileChooser fileChooser = new FileChooser();
+    private final FileChooser fileChooser = new FileChooser();
 
     private final ProducerDemo producerDemo = new ProducerDemo();
 
