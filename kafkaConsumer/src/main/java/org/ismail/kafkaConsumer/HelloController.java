@@ -1,6 +1,5 @@
 package org.ismail.kafkaConsumer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -12,8 +11,9 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
-import org.ismail.kafkaConsumer.configs.ConsumerProperties;
 import org.ismail.kafkaConsumer.utils.MyMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -35,11 +35,12 @@ public class HelloController {
     private ScrollPane scrollPane;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    private final Logger logger = LoggerFactory.getLogger(HelloController.class);
 
     private final AtomicReference<TopicListener> currentListener = new AtomicReference<>();
 
     @FXML
-    protected void previewMessages() throws JsonProcessingException {
+    protected void previewMessages() {
         String topicName = topic.getText().trim();
         if (topicName.isEmpty()) return;
 
@@ -49,9 +50,7 @@ public class HelloController {
         fileArea.getChildren().clear();
         status.setText("Durum: Dinleniyor " + topicName);
 
-        TopicListener listener = new TopicListener(topicName, message -> {
-            Platform.runLater(() -> displayMessage(message));
-        });
+        TopicListener listener = new TopicListener(topicName, message -> Platform.runLater(() -> displayMessage(message)));
         currentListener.set(listener);
         Thread t = new Thread(listener);
         t.setDaemon(true);
@@ -128,7 +127,7 @@ public class HelloController {
                     });
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
                 }
                 break;
         }

@@ -7,6 +7,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.ismail.kafkaConsumer.configs.ConsumerProperties;
 import org.ismail.kafkaConsumer.utils.JsonUtil;
 import org.ismail.kafkaConsumer.utils.MyMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -17,9 +19,11 @@ public class TopicListener implements Runnable {
     private final String topicName;
     private final Consumer<MyMessage> callback;
     private volatile boolean running = true;
+    private final Logger logger;
 
     public TopicListener(String topicName, Consumer<MyMessage> callback) {
         ConsumerProperties consumerProperties = new ConsumerProperties();
+        logger = LoggerFactory.getLogger(TopicListener.class);
         this.consumer = new KafkaConsumer<>(consumerProperties.fileProperties);
         this.topicName = topicName;
         this.callback = callback;
@@ -37,7 +41,7 @@ public class TopicListener implements Runnable {
                     System.out.println("File received: " + msg.toString());
                     callback.accept(msg);
                 } catch (JsonProcessingException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
                 }
             }
         }
