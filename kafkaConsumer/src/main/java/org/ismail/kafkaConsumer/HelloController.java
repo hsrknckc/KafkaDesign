@@ -1,54 +1,102 @@
 package org.ismail.kafkaConsumer;
 
+import ch.qos.logback.classic.Level;
+import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
-import javafx.util.Duration;
+import org.ismail.kafkaConsumer.utils.BasicHttpServer;
+import org.ismail.kafkaConsumer.utils.LogCatcher;
 import org.ismail.kafkaConsumer.utils.MyMessage;
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HelloController {
     @FXML
     private TextField topic;
     @FXML
-    private VBox fileArea;
+    private ListView<VBox> fileArea;
     @FXML
     private Label status;
-
     @FXML
-    private ScrollPane scrollPane;
+    private ComboBox<String> topicBox;
+    final ObservableList<VBox> messages = FXCollections.observableArrayList();
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-    private final Logger logger = LoggerFactory.getLogger(HelloController.class);
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(HelloController.class);
+
+    private BasicHttpServer server;
+    public static final AtomicBoolean isListening=new AtomicBoolean(false);
+
+    @FXML
+    public void initialize() {
+        topicBox.getItems().addAll("topic_metin", "topic_resim", "topic_ses");
+        topicBox.setOnAction(event -> topic.setText(topicBox.getValue()));
+        fileArea.setItems(messages);
+
+        try {
+            File downloadDir = new File("downloads");
+            if (!downloadDir.exists()) //noinspection ResultOfMethodCallIgnored
+                downloadDir.mkdirs();
+            server = new BasicHttpServer(8080, downloadDir);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+
+        Logger log = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        log.setLevel(Level.INFO);
+        LogCatcher catcher = new LogCatcher("Setting offset for partition");
+        catcher.start();
+        log.addAppender(catcher);
+    }
+
+    private HostServices hostServices;
+
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
+    }
+
+
+    private void openInBrowser(String filePath) {
+        if (hostServices != null) {
+            hostServices.showDocument(filePath);
+        }
+    }
+
 
     private final AtomicReference<TopicListener> currentListener = new AtomicReference<>();
+
+
+
 
     @FXML
     protected void previewMessages() {
         String topicName = topic.getText().trim();
         if (topicName.isEmpty()) return;
 
+
+
         TopicListener oldListener = currentListener.getAndSet(null);
         if (oldListener != null) oldListener.stop();
 
-        fileArea.getChildren().clear();
-        status.setText("Durum: Dinleniyor " + topicName);
+        status.setText("Lütfen bekleyin...");
+        fileArea.getItems().clear();
+        if(isListening.get()){
+            Platform.runLater(()->status.setText("Durum: Dinleniyor -> " + topicName));
+        }
 
         TopicListener listener = new TopicListener(topicName, message -> Platform.runLater(() -> displayMessage(message)));
         currentListener.set(listener);
@@ -58,85 +106,55 @@ public class HelloController {
     }
 
     private void displayMessage(MyMessage message) {
-        Label infoLabel = new Label(
-                "Dosya adı: " + message.getName() +
-                        ", Tür: " + message.getDataType() +
-                        ", Zaman: " + message.getTime().format(formatter));
-        fileArea.getChildren().add(infoLabel);
-        switch (message.getDataType()) {
-            case "string":
-                Label msgLabel1 = new Label(message.getTextData());
-                fileArea.getChildren().add(msgLabel1);
-                break;
-            case "text":
-                String textContent = new String(message.getData(), StandardCharsets.UTF_8);
-                TextArea textArea = new TextArea(textContent);
-                textArea.setWrapText(true);
-                textArea.setEditable(false);
-                textArea.setPrefWidth(400);
-                fileArea.getChildren().add(textArea);
-                break;
-            case "image":
-                Image image = new Image(new ByteArrayInputStream(message.getData()));
-                ImageView imageView = new ImageView(image);
-                imageView.setPreserveRatio(true);
-                imageView.setFitWidth(400);
-                fileArea.getChildren().add(imageView);
-                break;
-            case "audio":
-                try {
-                    String tempFile = "temp_audio.mp3";
-                    Files.write(Paths.get(tempFile), message.getData());
-                    Media media = new Media(new File(tempFile).toURI().toString());
-                    MediaPlayer mediaPlayer = new MediaPlayer(media);
+        VBox tekMsg = new VBox();
+        Label infoLabel = new Label("Dosya adı: " + message.getName() + ", Tür: " + message.getDataType() + "\n" + "Zaman: " + message.getTime().format(formatter));
+        infoLabel.setWrapText(true);
+        tekMsg.setStyle("-fx-border-color: gray; " + "-fx-border-width: 2; " + "-fx-border-radius: 5; " + "-fx-padding: 2;");
+        VBox.setMargin(tekMsg, new Insets(0, 0, 2, 0));
+        tekMsg.getChildren().add(infoLabel);
 
-                    MediaView mediaView = new MediaView(mediaPlayer);
-                    fileArea.getChildren().add(mediaView);
+        if (!message.getDataType().equals("string")) {
+            try {
+                String folder = "downloads";
+                Files.createDirectories(Paths.get(folder));
+                String filePath = folder + File.separator + message.getName();
 
-                    Button playButton = new Button("Play");
-                    Button pauseButton = new Button("Pause");
-                    HBox controls = new HBox(10, playButton, pauseButton);
+                Files.write(Paths.get(filePath), message.getData());
+                Button downloadButton = new Button("İndir");
 
-                    Slider progress = new Slider();
-                    progress.setMin(0);
-                    progress.setMax(100);
-                    progress.setValue(0);
-                    progress.setPrefWidth(400);
 
-                    VBox audioBox = new VBox(5, controls, progress);
-                    fileArea.getChildren().add(audioBox);
-                    playButton.setOnAction(event -> mediaPlayer.play());
-                    pauseButton.setOnAction(event -> mediaPlayer.pause());
+                String url = "http://localhost:8080/" + message.getName();
+                downloadButton.setOnAction(event -> openInBrowser(url));
+                tekMsg.getChildren().add(downloadButton);
 
-                    mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-                        if (!progress.isValueChanging()) {
-                            Duration total = mediaPlayer.getTotalDuration();
-                            if (total != null && total.toMillis() > 0) {
-                                progress.setValue(newTime.toMillis() / total.toMillis() * 100);
-                            }
-                        }
-                    });
-
-                    progress.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
-                        if (!isChanging) {
-                            Duration total = mediaPlayer.getTotalDuration();
-                            if (total != null) {
-                                mediaPlayer.seek(total.multiply(progress.getValue() / 100.0));
-                            }
-                        }
-                    });
-
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                }
-                break;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            Label msgLabel1 = new Label(message.getTextData());
+            tekMsg.getChildren().add(msgLabel1);
         }
-        scrollPane.layout();
-        scrollPane.setVvalue(1.0);
+        messages.add(tekMsg);
     }
 
-    public void shutdown() {
+    public void shutdown() throws IOException {
+        deleteDownloads();
         TopicListener listener = currentListener.get();
         if (listener != null) listener.stop();
+        server.stop();
+    }
+
+    public void deleteDownloads() throws IOException {
+        Path downloads = Paths.get("downloads");
+        //noinspection resource
+        Files.walk(downloads)
+                .filter(path -> !path.equals(downloads))
+                .map(Path::toFile)
+                .forEach(file -> {
+                    if (!file.delete()) {
+                        logger.error("Silinemedi");
+                    }
+                });
+
     }
 }

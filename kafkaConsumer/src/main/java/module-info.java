@@ -5,10 +5,12 @@ module org.ismail.kafkaConsumer {
     requires javafx.base;
     requires org.slf4j;
     requires kafka.clients;
-    requires javafx.media;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
+    requires nanohttpd;
+    requires logback.classic;
+    requires logback.core;
     opens org.ismail.kafkaConsumer.utils to com.fasterxml.jackson.databind;
 
     opens org.ismail.kafkaConsumer to javafx.fxml;

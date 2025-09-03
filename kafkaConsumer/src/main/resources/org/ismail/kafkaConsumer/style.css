@@ -1,0 +1,13 @@
+*{
+    -fx-font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-padding: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5,0,0,2);
+}
+
+/* Sağ önizleme kutusu sol kolonun toplam yüksekliğine eşit */

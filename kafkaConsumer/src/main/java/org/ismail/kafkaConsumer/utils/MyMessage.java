@@ -8,10 +8,7 @@ import java.time.LocalDateTime;
 
 @SuppressWarnings("ALL")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE,
-        getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY,
-        setterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY,
-        isGetterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, setterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
 public class MyMessage {
     private LocalDateTime time;
     private String dataType;
@@ -23,9 +20,10 @@ public class MyMessage {
     private String name;
 
 
-    public MyMessage() {}
+    public MyMessage() {
+    }
 
-    public MyMessage(String name,LocalDateTime time, String dataType, byte[] data, String producer, String topic) {
+    public MyMessage(String name, LocalDateTime time, String dataType, byte[] data, String producer, String topic) {
         this.name = name;
         this.time = time;
         this.dataType = dataType;
@@ -34,7 +32,7 @@ public class MyMessage {
         this.topic = topic;
     }
 
-    public MyMessage(String name,LocalDateTime time, String dataType, String dataPath, String producer, String topic) {
+    public MyMessage(String name, LocalDateTime time, String dataType, String dataPath, String producer, String topic) {
         this.name = name;
         this.time = time;
         this.dataType = dataType;
@@ -126,15 +124,6 @@ public class MyMessage {
 
     @Override
     public String toString() {
-        return "MyMessage{" +
-                "name='" + name + '\'' +
-                "time=" + time +
-                ", dataType='" + dataType + '\'' +
-                ", data=" + "..." +
-                ", textData='" + textData + '\'' +
-                ", producer='" + producer + '\'' +
-                ", topic='" + topic + '\'' +
-                ", dataPath='" + dataPath + '\'' +
-                '}';
+        return "MyMessage{" + "name='" + name + '\'' + "time=" + time + ", dataType='" + dataType + '\'' + ", data=" + "..." + ", textData='" + textData + '\'' + ", producer='" + producer + '\'' + ", topic='" + topic + '\'' + ", dataPath='" + dataPath + '\'' + '}';
     }
 }
