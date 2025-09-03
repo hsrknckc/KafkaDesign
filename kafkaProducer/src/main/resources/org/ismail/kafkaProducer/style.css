@@ -15,27 +15,4 @@
     -fx-font-weight: bold;
 }
 
-.start-btn {
-    -fx-background-color: #4a8061;
-    -fx-text-fill: white;
-    -fx-padding: 8 14;
-    -fx-background-radius: 6;
-    -fx-font-weight: 900;
-
-}
-.start-btn:hover{
-    -fx-background-color: #325742;
-}
-
-.status-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #333;
-}
-
 /* Sağ önizleme kutusu sol kolonun toplam yüksekliğine eşit */
-.preview {
-    -fx-padding: 15;
-    -fx-background-color: #f9f9f9;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-}

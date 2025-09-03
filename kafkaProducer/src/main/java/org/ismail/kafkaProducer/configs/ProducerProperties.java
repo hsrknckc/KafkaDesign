@@ -8,10 +8,10 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class ProducerProperties {
-    public Properties textProperties = new Properties();
-    public Properties fileProperties = new Properties();
-    public String path = Paths.get(System.getProperty("user.dir"),"..","k","ssl").toAbsolutePath().toString();
-    public String trustStorePath = Paths.get(path,"kafka.producer.truststore.jks").toString();
+    public final Properties textProperties = new Properties();
+    public final Properties fileProperties = new Properties();
+    public final String path = Paths.get(System.getProperty("user.dir"),"..","k","ssl").toAbsolutePath().toString();
+    public final String trustStorePath = Paths.get(path,"kafka.producer.truststore.jks").toString();
     public ProducerProperties() {
         textProperties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         textProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());

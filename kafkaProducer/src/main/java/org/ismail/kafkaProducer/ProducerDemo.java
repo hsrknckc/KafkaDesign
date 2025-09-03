@@ -28,8 +28,8 @@ public class ProducerDemo {
     }
 
     public void sendStringMessage(String topicName, String msg) throws JsonProcessingException {
-        MyMessage message = new MyMessage("str",LocalDateTime.now(),msg,"sasl-producer",topicName);
-        String jsonString=JsonUtil.mapper().writeValueAsString(message);
+        MyMessage message = new MyMessage("str", LocalDateTime.now(), msg, "sasl-producer", topicName);
+        String jsonString = JsonUtil.mapper().writeValueAsString(message);
         System.out.println(message);
         ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName, jsonString.getBytes(StandardCharsets.UTF_8));
         fileProducer.send(record, (recordMetadata, e) -> {
@@ -44,17 +44,19 @@ public class ProducerDemo {
 
     public void sendFileMessage(String topicName, String filePath) throws IOException {
         File file = new File(filePath);
-        byte[] fileBytes= Files.readAllBytes(Paths.get(filePath));
+        byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
         String mimeType = getFileType(filePath);
 
-        MyMessage message = new MyMessage(file.getName(),LocalDateTime.now(),mimeType,fileBytes,"sasl-producer",topicName);
+        //MyMessage bigMessage = new MyMessage(file.getName(),LocalDateTime.now(),mimeType,filePath,"sasl-producer",topicName);
+
+        MyMessage message = new MyMessage(file.getName(), LocalDateTime.now(), mimeType, fileBytes, "sasl-producer", topicName);
         String jsonString = JsonUtil.mapper().writeValueAsString(message);
         System.out.println(message);
-        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName,jsonString.getBytes(StandardCharsets.UTF_8));
+        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName, jsonString.getBytes(StandardCharsets.UTF_8));
         fileProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
                 log.error("Send failed", e);
-            }else{
+            } else {
                 log.info("File sent");
             }
         });
