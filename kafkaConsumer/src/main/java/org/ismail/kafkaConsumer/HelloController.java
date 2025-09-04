@@ -111,14 +111,7 @@ public class HelloController {
 
         if (!message.getDataType().equals("string")) {
             try {
-                String folder = "downloads";
-                Files.createDirectories(Paths.get(folder));
-                String filePath = folder + File.separator + message.getName();
-
-                Files.write(Paths.get(filePath), message.getData());
                 Button downloadButton = new Button("İndir");
-
-
                 String url = "http://localhost:8080/" + message.getName();
                 downloadButton.setOnAction(event -> openInBrowser(url));
                 tekMsg.getChildren().add(downloadButton);

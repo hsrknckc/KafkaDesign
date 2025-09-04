@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, setterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
 public class MyMessage {
+    private String fileId;
     private LocalDateTime time;
     private String dataType;
     private byte[] data;
@@ -18,18 +19,24 @@ public class MyMessage {
     private String topic;
     private String dataPath;
     private String name;
+    private int chunkNumber;
+    private int totalChunk;
+    public static final int chunkSize = 1024000;
 
 
     public MyMessage() {
     }
 
-    public MyMessage(String name, LocalDateTime time, String dataType, byte[] data, String producer, String topic) {
+    public MyMessage(String name, LocalDateTime time, String dataType, byte[] data, String producer, String topic,String fileId, int chunkNumber, int totalChunk) {
         this.name = name;
         this.time = time;
         this.dataType = dataType;
         this.data = data;
         this.producer = producer;
         this.topic = topic;
+        this.fileId = fileId;
+        this.chunkNumber = chunkNumber;
+        this.totalChunk = totalChunk;
     }
 
     public MyMessage(String name, LocalDateTime time, String dataType, String dataPath, String producer, String topic) {
@@ -120,6 +127,33 @@ public class MyMessage {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonProperty("chunkNumber")
+    public int getChunkNumber() {
+        return chunkNumber;
+    }
+
+    public void setChunkNumber(int chunkNumber) {
+        this.chunkNumber = chunkNumber;
+    }
+
+    @JsonProperty("totalChunk")
+    public int getTotalChunk() {
+        return totalChunk;
+    }
+
+    public void setTotalChunk(int totalChunk) {
+        this.totalChunk = totalChunk;
+    }
+
+    @JsonProperty("fileId")
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     @Override
