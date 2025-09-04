@@ -1,10 +1,13 @@
-// main.js
-
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn } = require("child_process");
 
 const db = require("./db.js");
-const kafkaDir = "../k/";
+const path = require("path");
+const kafkaPath = app.isPackaged
+  ? path.join(process.execPath, "../../../k/")
+  : path.join(__dirname, "../k/");
+const kafkaDir = kafkaPath;
+const powerShell = "powershell.exe";
 
 const user = {};
 let portNumber = 9092;
@@ -78,7 +81,7 @@ ipcMain.on("login", (event, { username, password }) => {
 ipcMain.on("run-zookeeper", (event) => {
   const runZookeeperCommand =
     "./bin/windows/zookeeper-server-start.bat ./config/zookeeper.properties";
-  const ps = spawn("powershell.exe", ["-Command", runZookeeperCommand], {
+  const ps = spawn(powerShell, ["-Command", runZookeeperCommand], {
     cwd: kafkaDir,
   });
 
@@ -118,7 +121,7 @@ ipcMain.on("run-kafka", (event, port) => {
   portNumber = port || 9092;
   const runKafkaCommand = `./bin/windows/kafka-server-start.bat ./config/server-0.properties --override listeners=SASL_SSL://localhost:${portNumber} --override advertised.listeners=SASL_SSL://localhost:${portNumber}`;
 
-  const ps = spawn("powershell.exe", ["-Command", runKafkaCommand], {
+  const ps = spawn(powerShell, ["-Command", runKafkaCommand], {
     cwd: kafkaDir,
   });
 
@@ -157,7 +160,7 @@ ipcMain.on("run-kafka", (event, port) => {
 
 ipcMain.on("check-kafka", (event) => {
   const runningCheckCommand = "netstat -ano -p tcp | findstr /i 9092";
-  const ps = spawn("powershell.exe", [runningCheckCommand]);
+  const ps = spawn(powerShell, [runningCheckCommand]);
   ps.stdout.on("data", (data) => {
     const output = data.toString();
     if (output.includes("9092")) {
@@ -171,7 +174,7 @@ ipcMain.on("check-kafka", (event) => {
 
 ipcMain.on("check-zookeeper", (event) => {
   const runningCheckCommand = "netstat -ano -p tcp | findstr /i 2182";
-  const ps = spawn("powershell.exe", [runningCheckCommand]);
+  const ps = spawn(powerShell, [runningCheckCommand]);
   ps.stdout.on("data", (data) => {
     const output = data.toString();
     if (output.includes("2182")) {
@@ -185,7 +188,7 @@ ipcMain.on("check-zookeeper", (event) => {
 
 ipcMain.on("stop-kafka", (event) => {
   const kafkaStopCommand = "./bin/windows/kafka-server-stop.bat";
-  const ps = spawn("powershell.exe", ["-Command", kafkaStopCommand], {
+  const ps = spawn(powerShell, ["-Command", kafkaStopCommand], {
     cwd: kafkaDir,
   });
 
@@ -203,7 +206,7 @@ ipcMain.on("stop-kafka", (event) => {
     const zkDeleteCommand =
       "./bin/windows/zookeeper-shell.bat localhost:2182 -zk-tls-config-file ./config/zookeeper-client.properties delete /brokers/ids/0";
 
-    const zk = spawn("powershell.exe", ["-Command", zkDeleteCommand], {
+    const zk = spawn(powerShell, ["-Command", zkDeleteCommand], {
       cwd: kafkaDir,
     });
 
@@ -229,7 +232,7 @@ ipcMain.on("stop-zookeeper", (event) => {
   const zkDeleteCommand =
     "./bin/windows/zookeeper-shell.bat localhost:2182 -zk-tls-config-file ./config/zookeeper-client.properties delete /brokers/ids/0";
 
-  const zk = spawn("powershell.exe", ["-Command", zkDeleteCommand], {
+  const zk = spawn(powerShell, ["-Command", zkDeleteCommand], {
     cwd: kafkaDir,
   });
   zk.stdout.on("data", (data) => {
@@ -243,7 +246,7 @@ ipcMain.on("stop-zookeeper", (event) => {
   zk.on("close", () => {
     console.log("kafka zk node silindi ");
     const zookeeperStopCommand = "./bin/windows/zookeeper-server-stop.bat";
-    const ps = spawn("powershell.exe", ["-Command", zookeeperStopCommand], {
+    const ps = spawn(powerShell, ["-Command", zookeeperStopCommand], {
       cwd: kafkaDir,
     });
 
@@ -264,80 +267,3 @@ ipcMain.on("stop-zookeeper", (event) => {
     });
   });
 });
-
-// ipcMain.on("create-topic", (event,{topicName}) => {
-//   const createTopicCommand = `$env:KAFKA_HEAP_OPTS='-Xmx1G'; .\\bin\\windows\\kafka-topics.bat --create --topic ${topicName} --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties`;
-//   const ps = spawn("powershell.exe", ["-Command", createTopicCommand], {
-//     cwd: kafkaDir,
-//   });
-
-//   ps.stderr.on("data", (data) => {
-//     console.error(`ps hatası: ${data}`);
-//   });
-
-//   ps.on("close", (code) => {
-//     console.log(`child proc exit ${code}`);
-//     event.sender.send("kafka-output", {
-//       output: `Topic '${topicName}' başarıyla oluşturuldu`,
-//     });
-//   });
-// });
-
-// ipcMain.on("list-topics",(event)=>{
-//   const listTopicsCommand=`.\\bin\\windows\\kafka-topics.bat --list --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties`;
-//   const ps = spawn("powershell.exe", ["-Command", listTopicsCommand], {
-//     cwd: kafkaDir,
-//   });
-//   event.sender.send("list-topics", {
-//     output: `Topicler listeleniyor \n`,
-//   });
-//   ps.stdout.on("data", (data) => {
-//     event.sender.send("list-topics", {
-//       output: `${data}`,
-//     });
-//   });
-//   ps.stderr.on("data", (data) => {
-//     console.error(`ps hatası: ${data}`);
-//   });
-//   ps.on("close", (code) => {
-//     console.log(`child proc exit ${code}`);
-//     event.sender.send("list-topics", {
-//       output: `Topicler listelendi`,
-//     });
-//   });
-// });
-
-// ipcMain.on("list-users",(event)=>{
-//   const listUsersCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --describe`;
-//   const ps = spawn("powershell.exe", ["-Command", listUsersCommand], {
-//     cwd: kafkaDir,
-//   });
-//   event.sender.send("list-users", {
-//     output: `Kullanıcılar listeleniyor \n`,
-//   });
-//   ps.stdout.on("data", (data) => {
-//     event.sender.send("list-users", {
-//       output: `${data}`,
-//     });
-//   });
-//   ps.stderr.on("data", (data) => {
-//     console.error(`ps hatası: ${data}`);
-//   });
-//   ps.on("close", (code) => {
-//     console.log(`child proc exit ${code}`);
-//     event.sender.send("list-users", {
-//       output: `Kullanıcılar listelendi`,
-//     });
-//   });
-// });
-
-// ipcMain.on("create-user",(event, {username,password})=>{
-//   const createUserCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --entity-name sasl-consumer --alter --add-config 'SCRAM-SHA-512=[password=Bro123]'`;
-
-// });
-
-// ipcMain.on("delete-user",(event, {username})=>{
-//   const deleteUserCommand=`.\\bin\\windows\\kafka-configs.bat --bootstrap-server localhost:${portNumber} --command-config .\\config\\client-config.properties --entity-type users --entity-name sasl-consumer --alter --delete-config 'SCRAM-SHA-512'`;
-
-// });
-
