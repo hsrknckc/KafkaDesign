@@ -1,6 +1,7 @@
 package org.ismail.kafkaConsumer;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -12,7 +13,6 @@ import javafx.scene.layout.VBox;
 import org.ismail.kafkaConsumer.utils.BasicHttpServer;
 import org.ismail.kafkaConsumer.utils.LogCatcher;
 import org.ismail.kafkaConsumer.utils.MyMessage;
-import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HelloController {
@@ -34,12 +33,12 @@ public class HelloController {
     @FXML
     private ComboBox<String> topicBox;
     final ObservableList<VBox> messages = FXCollections.observableArrayList();
+    private String topicName;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(HelloController.class);
 
     private BasicHttpServer server;
-    public static final AtomicBoolean isListening=new AtomicBoolean(false);
 
     @FXML
     public void initialize() {
@@ -58,7 +57,7 @@ public class HelloController {
 
         Logger log = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         log.setLevel(Level.INFO);
-        LogCatcher catcher = new LogCatcher("Setting offset for partition");
+        LogCatcher catcher = new LogCatcher("Setting offset for partition", () -> status.setText("Durum: Dinleniyor -> " + topicName));
         catcher.start();
         log.addAppender(catcher);
     }
@@ -84,7 +83,7 @@ public class HelloController {
 
     @FXML
     protected void previewMessages() {
-        String topicName = topic.getText().trim();
+        topicName = topic.getText().trim();
         if (topicName.isEmpty()) return;
 
 
@@ -94,9 +93,6 @@ public class HelloController {
 
         status.setText("Lütfen bekleyin...");
         fileArea.getItems().clear();
-        if(isListening.get()){
-            Platform.runLater(()->status.setText("Durum: Dinleniyor -> " + topicName));
-        }
 
         TopicListener listener = new TopicListener(topicName, message -> Platform.runLater(() -> displayMessage(message)));
         currentListener.set(listener);

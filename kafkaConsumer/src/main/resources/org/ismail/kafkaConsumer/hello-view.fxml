@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.net.URL?>
-<VBox alignment="CENTER" prefHeight="450.0" prefWidth="500.0" spacing="20.0"
-      style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);"
-      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.ismail.kafkaConsumer.HelloController">
+
+<VBox alignment="CENTER" prefHeight="450.0" prefWidth="500.0" spacing="20.0" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ismail.kafkaConsumer.HelloController">
     <stylesheets>
-        <URL value="@style.css"/>
+        <URL value="@style.css" />
     </stylesheets>
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
+   <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Kafka Consumer" />
     <GridPane hgap="10" prefHeight="373.0" prefWidth="460.0" vgap="10">
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" prefWidth="120"/>
-            <ColumnConstraints hgrow="SOMETIMES" prefWidth="250"/>
-            <ColumnConstraints hgrow="SOMETIMES" prefWidth="120"/>
+            <ColumnConstraints hgrow="SOMETIMES" prefWidth="120" />
+            <ColumnConstraints hgrow="SOMETIMES" prefWidth="250" />
+            <ColumnConstraints hgrow="SOMETIMES" prefWidth="120" />
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints prefHeight="40" vgrow="SOMETIMES"/>
-            <RowConstraints prefHeight="40" vgrow="SOMETIMES"/>
-            <RowConstraints vgrow="ALWAYS"/>
+            <RowConstraints prefHeight="40" vgrow="SOMETIMES" />
+            <RowConstraints prefHeight="40" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="ALWAYS" />
         </rowConstraints>
         <HBox alignment="CENTER" spacing="10" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
-            <TextField fx:id="topic" prefWidth="150" promptText="Manuel topic giriş"/>
-            <ComboBox fx:id="topicBox" prefWidth="150.0" promptText="Topic seç"/>
-            <Button onAction="#previewMessages" text="Topic dinle"/>
+            <TextField fx:id="topic" prefWidth="150" promptText="Manuel topic giriş" />
+            <ComboBox fx:id="topicBox" prefWidth="150.0" promptText="Topic seç" />
+            <Button onAction="#previewMessages" text="Topic dinle" />
         </HBox>
-        <Label fx:id="status" text="Durum: Kapalı" GridPane.columnIndex="0" GridPane.columnSpan="3"
-               GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
-        <ListView fx:id="fileArea" prefWidth="460.0" styleClass="card" GridPane.columnIndex="0" GridPane.columnSpan="3"
-                  GridPane.rowIndex="2">
+        <Label fx:id="status" text="Durum: Kapalı" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+        <ListView fx:id="fileArea" prefWidth="460.0" styleClass="card" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="2">
 
         </ListView>
     </GridPane>
