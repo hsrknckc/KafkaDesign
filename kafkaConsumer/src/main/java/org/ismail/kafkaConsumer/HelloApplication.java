@@ -1,6 +1,7 @@
 package org.ismail.kafkaConsumer;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -21,9 +22,12 @@ public class HelloApplication extends Application {
         stage.setOnCloseRequest(event -> {
             try {
                 controller.shutdown();
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            Platform.exit();
+            System.exit(0);
         });
         stage.show();
     }
