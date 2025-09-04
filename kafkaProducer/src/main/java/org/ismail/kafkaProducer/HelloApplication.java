@@ -3,6 +3,7 @@ package org.ismail.kafkaProducer;
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,7 +16,11 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Kafka Producer Client");
         stage.setScene(scene);
-        stage.setOnCloseRequest(event -> producerDemo.close());
+        stage.setOnCloseRequest(event -> {
+            producerDemo.close();
+            Platform.exit();
+            System.exit(0);
+        });
         stage.show();
     }
 
