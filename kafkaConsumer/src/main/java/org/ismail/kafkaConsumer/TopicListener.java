@@ -40,7 +40,6 @@ public class TopicListener implements Runnable {
         consumer.subscribe(Collections.singletonList(topicName));
 
         Map<String, List<MyMessage>> fileChunks = new ConcurrentHashMap<>();
-        Map<String,Long> lastUpdate = new ConcurrentHashMap<>();
 
         while (running) {
             ConsumerRecords<String, byte[]> records = consumer.poll(java.time.Duration.ofMillis(500));
