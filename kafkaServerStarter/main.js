@@ -119,7 +119,7 @@ ipcMain.on("run-zookeeper", (event) => {
 
 ipcMain.on("run-kafka", (event, port) => {
   portNumber = port || 9092;
-  const runKafkaCommand = `./bin/windows/kafka-server-start.bat ./config/server-0.properties --override listeners=SASL_SSL://localhost:${portNumber} --override advertised.listeners=SASL_SSL://localhost:${portNumber}`;
+  const runKafkaCommand = `$env:JMX_PORT=9999 ; ./bin/windows/kafka-server-start.bat ./config/server-0.properties --override listeners=SASL_SSL://localhost:${portNumber} --override advertised.listeners=SASL_SSL://localhost:${portNumber}`;
 
   const ps = spawn(powerShell, ["-Command", runKafkaCommand], {
     cwd: kafkaDir,
