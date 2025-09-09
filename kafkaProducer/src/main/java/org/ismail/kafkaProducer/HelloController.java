@@ -2,17 +2,16 @@ package org.ismail.kafkaProducer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class HelloController {
     @FXML
@@ -22,27 +21,35 @@ public class HelloController {
     @FXML
     private TextField message;
     @FXML
-    private Label status1;
-    @FXML
-    private Label status2;
-    @FXML
     private ComboBox<String> topicBox;
     @FXML
     private ComboBox<String> topicBox2;
+    @FXML
+    private ListView<String> stringList;
+    @FXML
+    private ListView<String> fileList;
+
 
     private final FileChooser fileChooser = new FileChooser();
 
     private final ProducerDemo producerDemo = new ProducerDemo();
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private final ObservableList<String> stringObservableList = FXCollections.observableArrayList();
+    private final ObservableList<String> fileObservableList = FXCollections.observableArrayList();
+
+
 
     @FXML
     public void initialize() {
-        topicBox.getItems().addAll("topic_metin", "topic_resim", "topic_ses");
+        topicBox.getItems().addAll("topic_metin", "topic_resim_3", "topic_ses_3");
         topicBox.setOnAction(event -> topicName.setText(topicBox.getValue()));
 
-        topicBox2.getItems().addAll("topic_metin", "topic_resim", "topic_ses");
+        topicBox2.getItems().addAll("topic_metin", "topic_resim_3", "topic_ses_3");
         topicBox2.setOnAction(event -> topicName2.setText(topicBox2.getValue()));
+
+        stringList.setItems(stringObservableList);
+        fileList.setItems(fileObservableList);
     }
 
 
@@ -50,9 +57,17 @@ public class HelloController {
     protected void sendString() throws JsonProcessingException {
         String topic = topicName.getText().trim();
         String msg = message.getText();
-        producerDemo.sendStringMessage(topic, msg);
-        status1.setText("Gönderildi!");
-        scheduler.schedule(() -> Platform.runLater(() -> status1.setText("")), 1, TimeUnit.SECONDS);
+        producerDemo.sendStringMessage(topic, msg, new ProducerDemo.AckCallback() {
+            @Override
+            public void onSuccess(long offset) {
+                Platform.runLater(() -> stringObservableList.add("Başarıyla gönderildi! Offset: " + offset));
+            }
+
+            @Override
+            public void onFail(String error) {
+                Platform.runLater(() -> stringObservableList.add("Gönderilemedi: " + error));
+            }
+        });
     }
 
     File fileToSend;
@@ -61,10 +76,16 @@ public class HelloController {
     protected void sendFile() throws IOException {
         String topic = topicName2.getText().trim();
         String path = fileToSend.getAbsolutePath();
-        producerDemo.sendFileMessage(topic, path);
-        status2.setText("Gönderildi!");
-        scheduler.schedule(() -> Platform.runLater(() -> status2.setText("")), 1, TimeUnit.SECONDS);
-
+        producerDemo.sendFileMessage(topic, path,  new ProducerDemo.AckCallback() {
+            @Override
+            public void onSuccess(long offset) {
+                Platform.runLater(() -> fileObservableList.add("Chunk başarıyla gönderildi! Offset: " + offset));
+            }
+            @Override
+            public void onFail(String error) {
+                Platform.runLater(() -> fileObservableList.add("Gönderilemedi: " + error));
+            }
+        });
     }
 
     @FXML

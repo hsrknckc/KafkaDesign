@@ -22,6 +22,7 @@ public class ProducerProperties {
         textProperties.setProperty("sasl.mechanism", "SCRAM-SHA-512");
         textProperties.setProperty("sasl.jaas.config",
                 "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"sasl-producer\" password=\"Bro1234\";");
+        textProperties.setProperty(ProducerConfig.ACKS_CONFIG, "1");
 
         fileProperties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         fileProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -32,5 +33,10 @@ public class ProducerProperties {
         fileProperties.setProperty("sasl.mechanism", "SCRAM-SHA-512");
         fileProperties.setProperty("sasl.jaas.config","org.apache.kafka.common.security.scram.ScramLoginModule required username=\"sasl-producer\" password=\"Bro1234\";");
         fileProperties.setProperty("max.request.size", "10485760");
+        fileProperties.setProperty(ProducerConfig.ACKS_CONFIG, "1");
+        fileProperties.setProperty(ProducerConfig.RETRIES_CONFIG, "0");
+        fileProperties.setProperty(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "5000");
+        fileProperties.setProperty(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "3000");
+        fileProperties.setProperty(ProducerConfig.MAX_BLOCK_MS_CONFIG, "3000");
     }
 }

@@ -15,21 +15,22 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 
 import static org.ismail.kafkaProducer.utils.Utilities.getFileType;
 
 public class ProducerDemo {
     private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class);
     private final KafkaProducer<String, byte[]> fileProducer;
+    public final List<Long> produceSpeed;
 
     public ProducerDemo() {
         ProducerProperties producerProperties = new ProducerProperties();
         this.fileProducer = new KafkaProducer<>(producerProperties.fileProperties);
+        produceSpeed = new ArrayList<>();
     }
 
-    public void sendStringMessage(String topicName, String msg) throws JsonProcessingException {
+    public void sendStringMessage(String topicName, String msg, AckCallback callback) throws JsonProcessingException {
         MyMessage message = new MyMessage("str", LocalDateTime.now(), msg, "sasl-producer", topicName);
         String jsonString = JsonUtil.mapper().writeValueAsString(message);
         System.out.println(message);
@@ -37,14 +38,16 @@ public class ProducerDemo {
         fileProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
                 log.error("Send failed", e);
+                if(callback != null) callback.onFail(e.getMessage());
             } else {
-                log.info("String sent");
+                log.info("String sent, offset: {}", recordMetadata.offset());
+                if(callback != null) callback.onSuccess(recordMetadata.offset());
             }
         });
     }
 
 
-    public void sendFileMessage(String topicName, String filePath) throws IOException {
+    public void sendFileMessage(String topicName, String filePath,AckCallback callback) throws IOException {
         File file = new File(filePath);
         byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
         System.out.println(fileBytes.length);
@@ -53,6 +56,7 @@ public class ProducerDemo {
 
         int totalChunk = (int) Math.ceil((double)fileBytes.length / MyMessage.chunkSize);
         System.out.println(totalChunk);
+        long startTime= System.nanoTime();
         for(int i = 0; i < totalChunk; i++) {
             int start = i * MyMessage.chunkSize;
             int end = Math.min(start + MyMessage.chunkSize, fileBytes.length);
@@ -71,19 +75,31 @@ public class ProducerDemo {
             String jsonString = JsonUtil.mapper().writeValueAsString(message);
             System.out.println(message);
             ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName, jsonString.getBytes(StandardCharsets.UTF_8));
+
+            int chunkNumber = i;
             fileProducer.send(record, (recordMetadata, e) -> {
                 if (e != null) {
-                    log.error("Send failed", e);
+                    log.error("Chunk {} send failed ", chunkNumber, e);
+                    if(callback != null) callback.onFail("Chunk " + chunkNumber + ": " + e.getMessage());
                 } else {
-                    log.info("File sent");
+                    log.info("Chunk {} sent, offset: {}", chunkNumber, recordMetadata.offset());
+                    if(callback != null) callback.onSuccess(recordMetadata.offset());
                 }
             });
         }
+        long endTime= System.nanoTime();
+        produceSpeed.add((endTime - startTime)/1000000);
+        System.out.println("geçen süre:" + ((endTime - startTime)/1000000) + "ms");
     }
 
     public void close() {
         fileProducer.flush();
         fileProducer.close();
+    }
+
+    public interface AckCallback{
+        void onSuccess(long offset);
+        void onFail(String error);
     }
 }
 

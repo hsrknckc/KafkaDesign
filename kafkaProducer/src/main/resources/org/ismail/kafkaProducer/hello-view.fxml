@@ -5,51 +5,46 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="450" prefWidth="500" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ismail.kafkaProducer.HelloController">
+<VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ismail.kafkaProducer.HelloController">
+
     <stylesheets>
         <URL value="@style.css" />
     </stylesheets>
+
     <padding>
         <Insets bottom="20" left="20" right="20" top="20" />
     </padding>
-   <Label styleClass="card-title" text="Kafka Producer" />
-    <GridPane prefHeight="373.0" prefWidth="460.0" vgap="10.0">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" prefWidth="490.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints vgrow="SOMETIMES" />
-            <RowConstraints vgrow="SOMETIMES" />
-        </rowConstraints>
-        
-        <VBox alignment="CENTER" prefWidth="440.0" spacing="10" styleClass="card" GridPane.rowIndex="0">
-            <Label styleClass="card-title" text="String gönder" />
+
+    <Label styleClass="card-title" text="Kafka Producer" />
+    <HBox spacing="10.0">
+        <!-- String gönder kartı -->
+        <VBox alignment="CENTER" prefWidth="320" spacing="10" styleClass="card">
+            <Label styleClass="card-title" text="String gönder"/>
             <HBox alignment="CENTER" spacing="10">
-                <TextField fx:id="topicName" prefWidth="150" promptText="Manuel topic giriş" />
-                <ComboBox fx:id="topicBox" prefWidth="150.0" promptText="Topic seç" />
+                <TextField fx:id="topicName" prefWidth="150" promptText="Manuel topic giriş"/>
+                <ComboBox fx:id="topicBox" prefWidth="150.0" promptText="Topic seç"/>
             </HBox>
-            <TextField fx:id="message" promptText="Mesajını gir..." />
+            <TextField fx:id="message" promptText="Mesajını gir..."/>
             <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="sendString" onAction="#sendString" text="Gönder" />
+                <Button fx:id="sendString" onAction="#sendString" styleClass="primary-btn" text="Gönder"/>
             </HBox>
-            <Label fx:id="status1" />
+         <ListView fx:id="stringList" prefHeight="200.0" prefWidth="200.0" styleClass="rounded-list"
+                   style="-fx-background-color: #3a5f4f; -fx-control-inner-background: #3a5f4f; -fx-text-fill: white; -fx-background-radius: 10; -fx-border-radius: 10;"/>
         </VBox>
 
-        <VBox alignment="CENTER" spacing="10" styleClass="card" GridPane.rowIndex="1">
-            <Label styleClass="card-title" text="Dosya gönder" />
+        <!-- Dosya gönder kartı -->
+        <VBox alignment="CENTER" prefWidth="320" spacing="10" styleClass="card">
+            <Label styleClass="card-title" text="Dosya gönder" translateY="-18.0"/>
             <HBox alignment="CENTER" spacing="10">
-                <TextField fx:id="topicName2" prefWidth="150" promptText="Manuel topic giriş" />
-                <ComboBox fx:id="topicBox2" prefWidth="150.0" promptText="Topic seç" />
+                <TextField fx:id="topicName2" prefWidth="150" promptText="Manuel topic giriş"/>
+                <ComboBox fx:id="topicBox2" prefWidth="150.0" promptText="Topic seç"/>
             </HBox>
-            <Button fx:id="selectFile" mnemonicParsing="false" onAction="#selectFile" text="Dosya Seç" />
-            <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="sendFile" onAction="#sendFile" text="Gönder" />
+            <HBox alignment="CENTER" spacing="10" translateY="15.0">
+                <Button fx:id="sendFile" onAction="#sendFile" styleClass="primary-btn" text="Gönder"/>
+                <Button fx:id="selectFile" onAction="#selectFile" styleClass="secondary-btn" text="Dosya Seç"/>
             </HBox>
-            <Label fx:id="status2" />
+         <ListView fx:id="fileList" prefHeight="200.0" prefWidth="200.0" translateY="17.0" styleClass="rounded-list"
+                   style="-fx-background-color: #3a5f4f; -fx-control-inner-background: #3a5f4f; -fx-text-fill: white; -fx-background-radius: 10; -fx-border-radius: 10;"/>
         </VBox>
-      <VBox.margin>
-         <Insets top="20.0" />
-      </VBox.margin>
-    </GridPane>
-
+    </HBox>
 </VBox>
