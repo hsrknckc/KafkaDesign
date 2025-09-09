@@ -48,31 +48,32 @@ public class TopicListener implements Runnable {
                     String jsonStr = new String(record.value(), StandardCharsets.UTF_8);
                     MyMessage msg = JsonUtil.mapper().readValue(jsonStr, MyMessage.class);
                     System.out.println("File received: " + msg.toString());
+                    if(msg.getFileId()!=null){
+                        System.out.println("file id: " + msg.getFileId());
+                        String fileId= msg.getFileId();
+                        fileChunks.putIfAbsent(fileId,new ArrayList<>());
+                        fileChunks.get(fileId).add(msg);
 
-                    System.out.println("file id: " + msg.getFileId());
-                    String fileId= msg.getFileId();
-                    fileChunks.putIfAbsent(fileId,new ArrayList<>());
-                    fileChunks.get(fileId).add(msg);
+                        if(fileChunks.get(fileId).size()==msg.getTotalChunk()) {
+                            List<MyMessage> sortedChunks = fileChunks.get(fileId).stream()
+                                    .sorted(Comparator.comparingInt(MyMessage::getChunkNumber))
+                                    .toList();
 
-                    if(fileChunks.get(fileId).size()==msg.getTotalChunk()){
-                        List<MyMessage> sortedChunks = fileChunks.get(fileId).stream()
-                                .sorted(Comparator.comparingInt(MyMessage::getChunkNumber))
-                                .toList();
+                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                            for (MyMessage chunk : sortedChunks) {
+                                outputStream.write(chunk.getData());
+                            }
+                            byte[] fullFile = outputStream.toByteArray();
 
-                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                        for(MyMessage chunk : sortedChunks){
-                            outputStream.write(chunk.getData());
+                            String folder = "downloads";
+                            Files.createDirectories(Paths.get(folder));
+                            String filePath = folder + File.separator + msg.getName();
+                            Files.write(Paths.get(filePath), fullFile);
+
+                            System.out.println("Dosya birleştirildi");
+
+                            fileChunks.remove(fileId);
                         }
-                        byte[] fullFile = outputStream.toByteArray();
-
-                        String folder = "downloads";
-                        Files.createDirectories(Paths.get(folder));
-                        String filePath = folder + File.separator + msg.getName();
-                        Files.write(Paths.get(filePath), fullFile);
-
-                        System.out.println("Dosya birleştirildi" );
-
-                        fileChunks.remove(fileId);
 
                     }
 
@@ -84,6 +85,7 @@ public class TopicListener implements Runnable {
                 }
             }
         }
+        consumer.wakeup();
         consumer.close();
     }
 

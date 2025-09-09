@@ -42,7 +42,7 @@ public class HelloController {
 
     @FXML
     public void initialize() {
-        topicBox.getItems().addAll("topic_metin", "topic_resim", "topic_ses");
+        topicBox.getItems().addAll("topic_metin", "topic_resim_3", "topic_ses_3");
         topicBox.setOnAction(event -> topic.setText(topicBox.getValue()));
         fileArea.setItems(messages);
 
@@ -57,7 +57,7 @@ public class HelloController {
 
         Logger log = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         log.setLevel(Level.INFO);
-        LogCatcher catcher = new LogCatcher("Setting offset for partition", () -> status.setText("Durum: Dinleniyor -> " + topicName));
+        LogCatcher catcher = new LogCatcher("offset for partition", () -> status.setText("Durum: Dinleniyor -> " + topicName));
         catcher.start();
         log.addAppender(catcher);
     }
@@ -68,25 +68,18 @@ public class HelloController {
         this.hostServices = hostServices;
     }
 
-
     private void openInBrowser(String filePath) {
         if (hostServices != null) {
             hostServices.showDocument(filePath);
         }
     }
 
-
     private final AtomicReference<TopicListener> currentListener = new AtomicReference<>();
-
-
-
 
     @FXML
     protected void previewMessages() {
         topicName = topic.getText().trim();
         if (topicName.isEmpty()) return;
-
-
 
         TopicListener oldListener = currentListener.getAndSet(null);
         if (oldListener != null) oldListener.stop();
@@ -144,6 +137,5 @@ public class HelloController {
                         logger.error("Silinemedi");
                     }
                 });
-
     }
 }
