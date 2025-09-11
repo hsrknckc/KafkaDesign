@@ -11,6 +11,7 @@ module org.ismail.kafkaConsumer {
     requires nanohttpd;
     requires logback.classic;
     requires logback.core;
+    requires kafka.json.serializer;
     opens org.ismail.kafkaConsumer.utils to com.fasterxml.jackson.databind;
 
     opens org.ismail.kafkaConsumer to javafx.fxml;

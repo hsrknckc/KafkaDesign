@@ -116,7 +116,7 @@ public class HelloController {
             Label msgLabel1 = new Label(message.getTextData());
             tekMsg.getChildren().add(msgLabel1);
         }
-        messages.add(tekMsg);
+        messages.addFirst(tekMsg);
     }
 
     public void shutdown() throws IOException {

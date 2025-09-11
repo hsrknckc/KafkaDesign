@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.ismail.kafkaConsumer.configs.ConsumerProperties;
-import org.ismail.kafkaConsumer.utils.JsonUtil;
 import org.ismail.kafkaConsumer.utils.MyMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -21,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class TopicListener implements Runnable {
-    private final KafkaConsumer<String, byte[]> consumer;
+    private final KafkaConsumer<String, MyMessage> consumer;
     private final String topicName;
     private final Consumer<MyMessage> callback;
     private volatile boolean running = true;
@@ -42,11 +40,15 @@ public class TopicListener implements Runnable {
         Map<String, List<MyMessage>> fileChunks = new ConcurrentHashMap<>();
 
         while (running) {
-            ConsumerRecords<String, byte[]> records = consumer.poll(java.time.Duration.ofMillis(500));
-            for (ConsumerRecord<String, byte[]> record : records) {
+            ConsumerRecords<String, MyMessage> records = consumer.poll(java.time.Duration.ofMillis(500));
+            long sTime = System.currentTimeMillis();
+            for (ConsumerRecord<String, MyMessage> record : records) {
                 try {
-                    String jsonStr = new String(record.value(), StandardCharsets.UTF_8);
-                    MyMessage msg = JsonUtil.mapper().readValue(jsonStr, MyMessage.class);
+                    //String jsonStr = new String(record.value(), StandardCharsets.UTF_8);
+                    //MyMessage msg = JsonUtil.mapper().readValue(jsonStr, MyMessage.class);
+
+                    MyMessage msg = record.value();
+
                     System.out.println("File received: " + msg.toString());
                     if(msg.getFileId()!=null){
                         System.out.println("file id: " + msg.getFileId());
@@ -78,6 +80,8 @@ public class TopicListener implements Runnable {
                     }
 
                     callback.accept(msg);
+                    long eTime = System.currentTimeMillis();
+                    System.out.println(eTime - sTime);
                 } catch (JsonProcessingException e) {
                     logger.error(e.getMessage());
                 } catch (IOException e) {
