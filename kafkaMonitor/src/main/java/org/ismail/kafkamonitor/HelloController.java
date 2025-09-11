@@ -7,14 +7,22 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.ismail.kafkamonitor.utils.MonitorListener;
 import org.ismail.kafkamonitor.utils.MonitoredMessage;
 
+import javax.management.*;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -33,10 +41,15 @@ public class HelloController {
     @FXML private Label status1;
     @FXML private LineChart<String, Number> messagesChart;
     private final XYChart.Series<String, Number> messagesSeries = new XYChart.Series<>();
-    private final XYChart.Series<String, Number> requestSeries = new XYChart.Series<>();
-    private final XYChart.Series<String, Number> latencySeries = new XYChart.Series<>();
+    private final XYChart.Series<String, Number> consumeSeries = new XYChart.Series<>();
 
-    @FXML private LineChart<String, Number> latencyChart;
+    @FXML private LineChart<String, Number> consumeChart;
+
+    @FXML private LineChart<String, Number> memoryChart;
+    private final XYChart.Series<String, Number> memorySeries = new XYChart.Series<>();
+
+    @FXML private LineChart<String, Number> cpuChart;
+    private final XYChart.Series<String, Number> cpuSeries = new XYChart.Series<>();
 
     @FXML private TableView<MonitoredMessage> messagesTable;
     @FXML private TableColumn<MonitoredMessage, Long> offsetColumn;
@@ -44,6 +57,8 @@ public class HelloController {
     @FXML private TableColumn<MonitoredMessage, String> timeColumn;
     @FXML private TableColumn<MonitoredMessage, String> topicColumn;
     @FXML private TableColumn<MonitoredMessage, String> readStatusColumn;
+    @FXML private TableColumn<MonitoredMessage, String> dataColumn;
+    @FXML private TableColumn<MonitoredMessage, String> produceTimeMsColumn;
 
     private final ObservableList<MonitoredMessage> monitorData = FXCollections.observableArrayList();
     private final AtomicReference<MonitorListener> currentListener = new AtomicReference<>();
@@ -52,6 +67,7 @@ public class HelloController {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
     @FXML private TextArea clusterInfoArea;
+    @FXML private TextArea brokerLatency;
 
 
     @FXML
@@ -77,16 +93,23 @@ public class HelloController {
         clusterInfoArea.setText(AdminOperations.describeClusterInfo());
 
         // LineChart setup
-        messagesChart.getData().addAll(messagesSeries,requestSeries);
+        messagesChart.getData().add(messagesSeries);
         messagesChart.setLegendVisible(false);
         messagesSeries.setName("Messages/sec");
-        requestSeries.setName("Requests/sec");
 
 
-        latencyChart.getData().add(latencySeries);
-        latencyChart.setLegendVisible(false);
-        latencySeries.setName("Avg Latency (ms)");
+        consumeChart.getData().add(consumeSeries);
+        consumeChart.setLegendVisible(false);
+        consumeSeries.setName("Avg Latency (ms)");
 
+
+        memoryChart.getData().add(memorySeries);
+        memoryChart.setLegendVisible(false);
+        memorySeries.setName("Memory");
+
+        cpuChart.getData().add(cpuSeries);
+        cpuChart.setLegendVisible(false);
+        cpuSeries.setName("CPU");
 
         // TableView setup
         offsetColumn.setCellValueFactory(new PropertyValueFactory<>("offset"));
@@ -96,7 +119,60 @@ public class HelloController {
         readStatusColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getConsumerGroupsReadStatus().toString())
         );
+        dataColumn.setCellValueFactory(new PropertyValueFactory<>("dataType"));
+        produceTimeMsColumn.setCellValueFactory(new PropertyValueFactory<>("produceTimeMs"));
         messagesTable.setItems(monitorData);
+        messagesTable.setRowFactory(tv -> {
+            TableRow<MonitoredMessage> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if(!row.isEmpty() && event.getClickCount() == 2){
+                    MonitoredMessage msg = row.getItem();
+
+                    Stage dialog = new Stage();
+                    dialog.initModality(Modality.APPLICATION_MODAL);
+                    dialog.setTitle("Mesaj detayı");
+
+                    VBox vbox = new VBox(10);
+                    vbox.setPadding(new Insets(10));
+
+                    TextArea textArea = new TextArea();
+                    textArea.setEditable(false);
+                    textArea.setWrapText(true);
+
+
+                    String sb;
+                    if(msg.getName().equals("str")){
+                        // Mesaj bilgisini oluştur
+                        sb = "File Name: " + msg.getName() + "\n" +
+                                "Chunk: " + msg.getChunkNumber() + "/" + msg.getTotalChunk() + "\n" +
+                                "Timestamp: " + msg.getTimestamp() + "\n" +
+                                "Topic: " + msg.getTopic() + "\n" +
+                                "Producer: " + msg.getProducer() + "\n" +
+                                "Message type: " + msg.getDataType() + "\n" +
+                                "Text data: " + msg.getTextData() + "\n";
+                        // İstersen diğer alanları da ekleyebilirsin
+                    }else{
+                        // Mesaj bilgisini oluştur
+                        sb = "File Name: " + msg.getName() + "\n" +
+                                "Chunk: " + msg.getChunkNumber() + "/" + msg.getTotalChunk() + "\n" +
+                                "Timestamp: " + msg.getTimestamp() + "\n" +
+                                "Topic: " + msg.getTopic() + "\n" +
+                                "Producer: " + msg.getProducer() + "\n" +
+                                "Message type: " + msg.getDataType() + "\n" +
+                                "Byte Length: " + msg.getData().length + "\n";
+                        // İstersen diğer alanları da ekleyebilirsin
+                    }
+
+                    textArea.setText(sb);
+
+                    vbox.getChildren().add(textArea);
+                    Scene scene = new Scene(vbox, 400, 300);
+                    dialog.setScene(scene);
+                    dialog.show();
+                }
+            });
+            return row;
+        });
 
         Timeline refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             refreshTable();
@@ -134,20 +210,36 @@ public class HelloController {
             String timeLabel = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
             long messages = AdminOperations.producerSpeed();
-            long requests = AdminOperations.getBrokerRequestPerSec();
+            long consumedBytes = AdminOperations.consumerByteSpeed();
             double latency = AdminOperations.getBrokerRequestLatencyMs();
+            DecimalFormat df = new DecimalFormat("#.##");
+
+            long memoryUsage = -1;
+            double cpuUsage = -1;
+            try {
+                memoryUsage = AdminOperations.getMemoryUsage();
+                cpuUsage = AdminOperations.getCpuUsage();
+
+            } catch (IOException | MBeanException | InstanceNotFoundException | MalformedObjectNameException |
+                     AttributeNotFoundException | ReflectionException e) {
+                throw new RuntimeException(e);
+            }
+
+            memorySeries.getData().add(new XYChart.Data<>(timeLabel, memoryUsage/1024000));
+            cpuSeries.getData().add(new XYChart.Data<>(timeLabel, cpuUsage));
+
+            brokerLatency.setText("Broker gecikmesi: " + df.format(latency) + " ms");
 
             messagesSeries.getData().add(new XYChart.Data<>(timeLabel, messages));
-            //requestSeries.getData().add(new XYChart.Data<>(timeLabel, requests));
-            latencySeries.getData().add(new XYChart.Data<>(timeLabel, latency));
+            consumeSeries.getData().add(new XYChart.Data<>(timeLabel, consumedBytes));
 
             // Limit chart points to last 30 entries
             if (messagesSeries.getData().size() > 30) messagesSeries.getData().removeFirst();
-            if (requestSeries.getData().size() > 30) requestSeries.getData().removeFirst();
-            if (latencySeries.getData().size() > 30) latencySeries.getData().removeFirst();
+            if (consumeSeries.getData().size() > 30) consumeSeries.getData().removeFirst();
+            if(memorySeries.getData().size() > 30) memorySeries.getData().removeFirst();
+
         });
     }
-
 
     public void stopMonitor(){
         MonitorListener listener = currentListener.get();
@@ -158,7 +250,7 @@ public class HelloController {
 
     private void startMonitorListener(String topic) {
         // Yeni listener callback ile kuruluyor
-        MonitorListener listener = new MonitorListener(topic, msg -> Platform.runLater(() -> monitorData.add(msg)));
+        MonitorListener listener = new MonitorListener(topic, msg -> Platform.runLater(() -> monitorData.addFirst(msg)));
 
         currentListener.set(listener);
 

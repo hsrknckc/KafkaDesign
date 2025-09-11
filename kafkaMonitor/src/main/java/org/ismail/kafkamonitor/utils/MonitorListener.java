@@ -1,5 +1,6 @@
 package org.ismail.kafkamonitor.utils;
 
+import org.slf4j.Logger;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
@@ -7,9 +8,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
-import org.apache.kafka.common.serialization.ByteArrayDeserializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.ismail.kafkamonitor.config.Props;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,17 +22,17 @@ public class MonitorListener implements Runnable {
     private volatile boolean running = true;
 
     private static final Props props = new Props();
-    private final KafkaConsumer<String, byte[]> consumer;
+    private final KafkaConsumer<String, MyMessage> consumer;
     private final AdminClient adminClient;
     private final String topic;
-    //private final Logger logger;
+    private final Logger logger;
     private final Consumer<MonitoredMessage> callback;
 
     public MonitorListener(String topic, Consumer<MonitoredMessage> callback) {
         this.adminClient = AdminClient.create(props.properties);
         this.topic = topic;
-        this.consumer = new KafkaConsumer<>(props.monitorProperties, new StringDeserializer(), new ByteArrayDeserializer());
-        //logger = LoggerFactory.getLogger(MonitorListener.class);
+        this.consumer = new KafkaConsumer<>(props.monitorProperties);
+        logger = LoggerFactory.getLogger(MonitorListener.class);
         this.callback = callback;
     }
 
@@ -41,29 +41,44 @@ public class MonitorListener implements Runnable {
         try{
             consumer.subscribe(Collections.singletonList(topic));
             while (running) {
-                ConsumerRecords<String, byte[]> records = consumer.poll(java.time.Duration.ofMillis(500));
-                for (ConsumerRecord<String, byte[]> record : records) {
+                ConsumerRecords<String, MyMessage> records = consumer.poll(java.time.Duration.ofMillis(500));
+                for (ConsumerRecord<String, MyMessage> record : records) {
                     try {
-                        MyMessage msg = JsonUtil.mapper().readValue(record.value(), MyMessage.class);
+
+                        MyMessage msg = record.value();
 
                         Map<String, Boolean> readStatus = getConsumerGroupReadStatus(topic, record.offset());
-
-                        MonitoredMessage monitoredMessage = new MonitoredMessage(
-                                topic,
-                                record.offset(),
-                                msg.getProducer(),
-                                msg.getTime(),
-                                msg.getTextData(),
-                                readStatus
-                        );
-
-                        // Bu metodu override edip UI’ya gönderebilirsin
-                        //handleMonitoredMessage(monitoredMessage);
-
+                        MonitoredMessage monitoredMessage;
+                        if(msg.getName().equals("str")) {
+                            monitoredMessage = new MonitoredMessage(
+                                    topic,
+                                    record.offset(),
+                                    msg.getProducer(),
+                                    msg.getTime(),
+                                    msg.getTextData(),
+                                    readStatus,
+                                    (record.timestamp() - msg.getProduceTime())
+                            );
+                        }else{
+                            monitoredMessage = new MonitoredMessage(
+                                    msg.getName(),
+                                    topic,
+                                    record.offset(),
+                                    msg.getProducer(),
+                                    msg.getTime(),
+                                    msg.getDataType(),
+                                    msg.getData(),
+                                    msg.getFileId(),
+                                    readStatus,
+                                    (record.timestamp() - msg.getProduceTime()),
+                                    msg.getChunkNumber(),
+                                    msg.getTotalChunk()
+                            );
+                        }
                         callback.accept(monitoredMessage);
 
                     } catch (Exception e) {
-                        //logger.error(e.getMessage());
+                        logger.error(e.getMessage());
                     }
                 }
         }}catch (WakeupException e){

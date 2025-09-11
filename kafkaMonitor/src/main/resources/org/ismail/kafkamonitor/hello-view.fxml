@@ -5,94 +5,160 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane prefHeight="700" prefWidth="1044" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ismail.kafkamonitor.HelloController">
+<TabPane side="LEFT" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ismail.kafkamonitor.HelloController">
+   <Tab closable="false" text="Yönetim">
+      <GridPane prefHeight="500" prefWidth="1000" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);">
 
-   <padding>
-      <Insets bottom="20" left="20" right="20" top="20" />
-   </padding>
-   <hgap>20</hgap>
-   <vgap>20</vgap>
+         <padding>
+            <Insets bottom="20" left="20" right="20" top="20" />
+         </padding>
+         <hgap>20</hgap>
+         <vgap>20</vgap>
 
-   <!-- Sütun tanımları -->
-   <columnConstraints>
-      <ColumnConstraints percentWidth="25.0" />
-      <ColumnConstraints percentWidth="25.0" />
-      <ColumnConstraints percentWidth="25.0" />
-      <ColumnConstraints percentWidth="25.0" />
-   </columnConstraints>
+         <!-- Sütun tanımları -->
+         <columnConstraints>
+            <ColumnConstraints percentWidth="25.0" />
+            <ColumnConstraints percentWidth="25.0" />
+            <ColumnConstraints percentWidth="25.0" />
+            <ColumnConstraints percentWidth="25.0" />
+         </columnConstraints>
 
-   <!-- Satır tanımları -->
-   <rowConstraints>
-      <RowConstraints percentHeight="35" />
-      <RowConstraints percentHeight="35" />
-      <RowConstraints percentHeight="30" />
-   </rowConstraints>
+         <!-- Satır tanımları -->
+         <rowConstraints>
+            <RowConstraints percentHeight="50" />
+            <RowConstraints percentHeight="50" />
+         </rowConstraints>
 
-   <!-- Row 0 -->
-   <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.rowIndex="0">
-      <ListView fx:id="topicListView" VBox.vgrow="ALWAYS" />
-      <Button onAction="#listTopicsList" styleClass="primary-btn" text="Topicleri görüntüle" />
-   </VBox>
+         <!-- Row 0 -->
+         <VBox minHeight="284.0" prefHeight="284.0" spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <ListView fx:id="topicListView" VBox.vgrow="ALWAYS" />
+            <Button onAction="#listTopicsList" styleClass="primary-btn" text="Topicleri görüntüle" />
+         </VBox>
 
-   <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="1" GridPane.rowIndex="0">
-      <TextField fx:id="newTopicName" promptText="ad" />
-      <TextField fx:id="partitionCount" promptText="partition sayısı" />
-      <TextField fx:id="replicationFactor" promptText="replication factor" />
-      <Button onAction="#createTopic" styleClass="primary-btn" text="Topic ekle" />
-      <Label fx:id="status1" />
+         <VBox minHeight="284.0" prefHeight="284.0" spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <TextField fx:id="newTopicName" promptText="ad" />
+            <TextField fx:id="partitionCount" promptText="partition sayısı" />
+            <TextField fx:id="replicationFactor" promptText="replication factor" />
+            <Button onAction="#createTopic" styleClass="primary-btn" text="Topic ekle" />
+            <Label fx:id="status1" />
 
-      <ComboBox fx:id="topicToDelete" prefWidth="150" />
-      <Button disable="true" onAction="#deleteTopic" styleClass="primary-btn" text="Topic sil" />
-   </VBox>
+            <ComboBox fx:id="topicToDelete" prefWidth="150" />
+            <Button disable="true" onAction="#deleteTopic" styleClass="primary-btn" text="Topic sil" />
+         </VBox>
 
 
-   <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="0">
-      <Label text="Broker ortalama gecikme" />
-      <LineChart fx:id="latencyChart" VBox.vgrow="ALWAYS">
-         <xAxis><CategoryAxis label="Saniye" /></xAxis>
-         <yAxis><NumberAxis label="Ort. ms" /></yAxis>
-      </LineChart>
-   </VBox>
+         <VBox minHeight="284.0" prefHeight="284.0" spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="0">
+            <Label text="Broker RAM kullanımı" />
+            <LineChart fx:id="memoryChart" VBox.vgrow="ALWAYS">
+               <xAxis>
+                  <CategoryAxis label=" " />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="MB"/>
+               </yAxis>
+            </LineChart>
+         </VBox>
 
-   <!-- Row 1 -->
-   <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.rowIndex="1">
-      <Label text="Cluster Bilgisi" />
-      <TextArea fx:id="clusterInfoArea" disable="true" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
-   </VBox>
+         <!-- Row 1 -->
+         <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <Label text="Cluster Bilgisi" />
+            <TextArea fx:id="clusterInfoArea" disable="true" editable="false" prefWidth="196.0" wrapText="true" VBox.vgrow="ALWAYS" />
+            <TextArea fx:id="brokerLatency" disable="true" editable="false" layoutX="30.0" layoutY="58.0" prefHeight="55.0" prefWidth="196.0" wrapText="true" />
+         </VBox>
 
-   <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="1" GridPane.rowIndex="1">
-      <Label text="Yetkilendirme" />
-      <ComboBox fx:id="permissionType" promptText="Tür" />
-      <TextField fx:id="aclCUser" promptText="kullanıcı adı" />
-      <TextField fx:id="groupId" disable="true" promptText="consumer group id" />
-      <TextField fx:id="aclCTopic" promptText="topic adı" />
-      <Button onAction="#createAcls" styleClass="primary-btn" text="Yetkilendir" />
-   </VBox>
+         <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Label text="Yetkilendirme" />
+            <ComboBox fx:id="permissionType" promptText="Tür" />
+            <TextField fx:id="aclCUser" promptText="kullanıcı adı" />
+            <TextField fx:id="groupId" disable="true" promptText="consumer group id" />
+            <TextField fx:id="aclCTopic" promptText="topic adı" />
+            <Button onAction="#createAcls" styleClass="primary-btn" text="Yetkilendir" />
+         </VBox>
 
-   <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
-      <Label text="Mesaj - Zaman(sn)" />
-      <LineChart fx:id="messagesChart" VBox.vgrow="ALWAYS">
-         <xAxis><CategoryAxis label="Saniye" /></xAxis>
-         <yAxis><NumberAxis label="Mesaj" /></yAxis>
-      </LineChart>
-   </VBox>
+         <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
+            <Label text="Broker CPU kullanımı" />
+            <LineChart fx:id="cpuChart" VBox.vgrow="ALWAYS">
+               <xAxis>
+                  <CategoryAxis label=" " />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label=" % "/>
+               </yAxis>
+            </LineChart>
+         </VBox>
 
-   <!-- Row 2 -->
-   <VBox prefWidth="1004.0" spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2">
-      <Label text="Producer Monitor" />
-      <TableView fx:id="messagesTable" VBox.vgrow="ALWAYS">
-         <columns>
-            <TableColumn fx:id="offsetColumn" prefWidth="70" text="Offset" />
-            <TableColumn fx:id="producerColumn" prefWidth="100" text="Producer" />
-            <TableColumn fx:id="timeColumn" prefWidth="180" text="Zaman" />
-            <TableColumn fx:id="topicColumn" prefWidth="176" text="Topic" />
-            <TableColumn fx:id="readStatusColumn" prefWidth="426" text="Okundu" />
-         </columns>
-      </TableView>
-      <HBox spacing="10">
-         <ComboBox fx:id="topicToSee" prefWidth="150" promptText="Topic seç" />
-         <Button onAction="#listenTopic" styleClass="secondary-btn" text="Listele" />
-      </HBox>
-   </VBox>
 
-</GridPane>
+      </GridPane>
+   </Tab>
+   <Tab closable="false" text="Gözetim">
+      <GridPane prefHeight="500" prefWidth="1000" style="-fx-background-color: linear-gradient(to bottom right, #7bb08c, #4a8061);">
+
+         <padding>
+            <Insets bottom="20" left="20" right="20" top="20" />
+         </padding>
+         <hgap>20</hgap>
+         <vgap>20</vgap>
+
+         <!-- Sütun tanımları -->
+         <columnConstraints>
+            <ColumnConstraints percentWidth="25.0" />
+            <ColumnConstraints percentWidth="25.0" />
+            <ColumnConstraints percentWidth="25.0" />
+            <ColumnConstraints percentWidth="25.0" />
+         </columnConstraints>
+
+         <!-- Satır tanımları -->
+         <rowConstraints>
+            <RowConstraints percentHeight="50" />
+            <RowConstraints percentHeight="50" />
+         </rowConstraints>
+
+         <!-- Row 0 -->
+         <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0">
+            <Label text="Produce grafik" />
+            <LineChart fx:id="messagesChart" VBox.vgrow="ALWAYS">
+               <xAxis>
+                  <CategoryAxis label="Saniye" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="MsgInPerSec" />
+               </yAxis>
+            </LineChart>
+         </VBox>
+
+
+         <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="0">
+            <Label text="Consume grafik" />
+            <LineChart fx:id="consumeChart" VBox.vgrow="ALWAYS">
+               <xAxis>
+                  <CategoryAxis label="Saniye" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="Byte" />
+               </yAxis>
+            </LineChart>
+         </VBox>
+
+         <!-- Row 1 -->
+         <VBox spacing="10" styleClass="card" stylesheets="@style.css" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1">
+            <Label text="Producer Monitor" />
+            <TableView fx:id="messagesTable" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="offsetColumn" prefWidth="70" text="Offset" />
+                  <TableColumn fx:id="producerColumn" prefWidth="100" text="Producer" />
+                  <TableColumn fx:id="timeColumn" prefWidth="142.00003051757812" text="Zaman" />
+                  <TableColumn fx:id="topicColumn" prefWidth="127.0" text="Topic" />
+                  <TableColumn fx:id="readStatusColumn" prefWidth="158.79998779296875" text="Okundu" />
+                  <TableColumn fx:id="dataColumn" prefWidth="139.0" text="Mesaj" />
+                  <TableColumn fx:id="produceTimeMsColumn" prefWidth="182.5999755859375" text="Produce süresi(ms)" />
+               </columns>
+            </TableView>
+            <HBox spacing="10">
+               <ComboBox fx:id="topicToSee" prefWidth="150" promptText="Topic seç" />
+               <Button onAction="#listenTopic" styleClass="secondary-btn" text="Listele" />
+            </HBox>
+         </VBox>
+
+      </GridPane>
+   </Tab>
+</TabPane>

@@ -4,24 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d97d70b-a070-4181-8955-a0d213122320" name="Changes" comment="monitor eklendi">
-      <change beforePath="$PROJECT_DIR$/../k/bin/zookeeper-server-start.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../k/bin/zookeeper-server-start.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../k/config/client-config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../k/config/client-config.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../k/config/consumer.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../k/config/consumer.properties" afterDir="false" />
+    <list default="true" id="6d97d70b-a070-4181-8955-a0d213122320" name="Changes" comment="cpu ve ram kullanımı eklendi">
       <change beforePath="$PROJECT_DIR$/../k/config/server-0.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../k/config/server-0.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../k/config/server-1.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../k/config/server-1.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../k/config/server-2.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../k/config/server-2.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../k/ssl/kafka.broker0.keystore.jks" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../k/ssl/kafka.broker0.truststore.jks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaConsumer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/HelloController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/TopicListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/TopicListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/HelloApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/configs/ConsumerProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/configs/ConsumerProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/utils/MyMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/utils/MyMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/AdminOperations.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/AdminOperations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/config/Props.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/config/Props.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitorListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitorListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitoredMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitoredMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MyMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MyMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/org/ismail/kafkamonitor/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/org/ismail/kafkamonitor/hello-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaProducer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/HelloController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/ProducerDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/ProducerDemo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/configs/ProducerProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/configs/ProducerProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/resources/org/ismail/kafkaProducer/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/resources/org/ismail/kafkaProducer/hello-view.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/resources/org/ismail/kafkaProducer/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/resources/org/ismail/kafkaProducer/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../kafkaServerStarter/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaServerStarter/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/utils/MyMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/utils/MyMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaServerStarter/users.db" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaServerStarter/users.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,6 +58,9 @@
     &quot;accountId&quot;: &quot;a1857882-aafc-47f3-a42b-3075efccb00e&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitorListener.java" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -135,6 +145,13 @@
       <workItem from="1757400297044" duration="5643000" />
       <workItem from="1757407836856" duration="1236000" />
       <workItem from="1757412559278" duration="9188000" />
+      <workItem from="1757480225944" duration="9595000" />
+      <workItem from="1757507823618" duration="3000" />
+      <workItem from="1757507836807" duration="808000" />
+      <workItem from="1757508654996" duration="427000" />
+      <workItem from="1757509092906" duration="583000" />
+      <workItem from="1757568388413" duration="9558000" />
+      <workItem from="1757583968154" duration="3442000" />
     </task>
     <task id="LOCAL-00001" summary="monitor eklendi">
       <option name="closed" value="true" />
@@ -152,6 +169,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="monitor eklendi" />
-    <option name="LAST_COMMIT_MESSAGE" value="monitor eklendi" />
+    <MESSAGE value="cpu ve ram kullanımı eklendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="cpu ve ram kullanımı eklendi" />
   </component>
 </project>

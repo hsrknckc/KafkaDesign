@@ -13,11 +13,13 @@ import org.apache.kafka.common.resource.ResourcePattern;
 import org.apache.kafka.common.resource.ResourceType;
 import org.ismail.kafkamonitor.config.Props;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -27,6 +29,7 @@ public class AdminOperations {
 
     private static long prevMessageCount = 0;
     private static long prevRequestCount = 0;
+    private static long prevConsumeCount = 0;
 
     public static Set<String> listTopics() throws ExecutionException, InterruptedException {
         ListTopicsResult listTopicsResult = adminClient.listTopics();
@@ -49,6 +52,25 @@ public class AdminOperations {
             long currentCount = (Long)value;
             long delta = currentCount - prevMessageCount;
             prevMessageCount = currentCount;
+            jmxc.close();
+            return delta;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public static long consumerByteSpeed() {
+        try {
+            JMXServiceURL jmxServiceURL = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi");
+            JMXConnector jmxc= JMXConnectorFactory.connect(jmxServiceURL,null);
+            MBeanServerConnection mbs = jmxc.getMBeanServerConnection();
+
+            ObjectName name = new ObjectName("kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec");
+            Object value = mbs.getAttribute(name,"Count");
+            long currentCount = (Long)value;
+            long delta = currentCount - prevConsumeCount;
+            prevConsumeCount = currentCount;
             jmxc.close();
             return delta;
         } catch (Exception e) {
@@ -195,5 +217,42 @@ public class AdminOperations {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    public static double getConsumerLag(){
+        try{
+            JMXServiceURL jmxServiceURL = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi");
+            JMXConnector jmxc= JMXConnectorFactory.connect(jmxServiceURL,null);
+            MBeanServerConnection mbs = jmxc.getMBeanServerConnection();
+
+            ObjectName name = new ObjectName("kafka.consumer:type=consumer-fetch-manager-metrics,client-id=sasl-consumer");
+            Object recordsLag = mbs.getAttribute(name, "records-lag-max");
+            jmxc.close();
+            return (Double)recordsLag;
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public static long getMemoryUsage() throws IOException {
+        JMXServiceURL jmxServiceURL = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi");
+        JMXConnector jmxc= JMXConnectorFactory.connect(jmxServiceURL,null);
+        MBeanServerConnection mbs = jmxc.getMBeanServerConnection();
+
+        MemoryMXBean memoryMXBean = ManagementFactory.newPlatformMXBeanProxy(mbs,ManagementFactory.MEMORY_MXBEAN_NAME,MemoryMXBean.class);
+
+        return memoryMXBean.getHeapMemoryUsage().getUsed();
+    }
+
+    public static double getCpuUsage() throws IOException, ReflectionException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, MalformedObjectNameException {
+        JMXServiceURL jmxServiceURL = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi");
+        JMXConnector jmxc= JMXConnectorFactory.connect(jmxServiceURL,null);
+        MBeanServerConnection mbs = jmxc.getMBeanServerConnection();
+
+        ObjectName osBeanName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+        double cpuLoad = (Double) mbs.getAttribute(osBeanName,"ProcessCpuLoad");
+        jmxc.close();
+        return cpuLoad*100;
     }
 }

@@ -15,6 +15,9 @@ module org.ismail.kafkamonitor {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
     requires org.slf4j;
+    requires kafka.json.serializer;
+    requires logback.classic;
+    requires jdk.management;
 
     opens org.ismail.kafkamonitor to javafx.fxml;
     exports org.ismail.kafkamonitor;
