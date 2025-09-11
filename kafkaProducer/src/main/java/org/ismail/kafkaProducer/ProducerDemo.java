@@ -11,37 +11,38 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.UUID;
 
 import static org.ismail.kafkaProducer.utils.Utilities.getFileType;
 
 public class ProducerDemo {
     private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class);
-    private final KafkaProducer<String, byte[]> fileProducer;
-    public final List<Long> produceSpeed;
+    private final KafkaProducer<String, MyMessage> fileProducer;
 
     public ProducerDemo() {
         ProducerProperties producerProperties = new ProducerProperties();
         this.fileProducer = new KafkaProducer<>(producerProperties.fileProperties);
-        produceSpeed = new ArrayList<>();
     }
 
     public void sendStringMessage(String topicName, String msg, AckCallback callback) throws JsonProcessingException {
         MyMessage message = new MyMessage("str", LocalDateTime.now(), msg, "sasl-producer", topicName);
-        String jsonString = JsonUtil.mapper().writeValueAsString(message);
+        //String jsonString = JsonUtil.mapper().writeValueAsString(message);
         System.out.println(message);
-        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName, jsonString.getBytes(StandardCharsets.UTF_8));
+        long startTime = System.currentTimeMillis();
+        message.setProduceTime(startTime);
+        ProducerRecord<String, MyMessage> record = new ProducerRecord<>(topicName, message);
         fileProducer.send(record, (recordMetadata, e) -> {
             if (e != null) {
                 log.error("Send failed", e);
                 if(callback != null) callback.onFail(e.getMessage());
             } else {
+                long endTime = System.currentTimeMillis();
                 log.info("String sent, offset: {}", recordMetadata.offset());
-                if(callback != null) callback.onSuccess(recordMetadata.offset());
+                if(callback != null) callback.onSuccess(recordMetadata.offset(), (endTime - startTime));
             }
         });
     }
@@ -56,7 +57,6 @@ public class ProducerDemo {
 
         int totalChunk = (int) Math.ceil((double)fileBytes.length / MyMessage.chunkSize);
         System.out.println(totalChunk);
-        long startTime= System.nanoTime();
         for(int i = 0; i < totalChunk; i++) {
             int start = i * MyMessage.chunkSize;
             int end = Math.min(start + MyMessage.chunkSize, fileBytes.length);
@@ -74,7 +74,10 @@ public class ProducerDemo {
 
             String jsonString = JsonUtil.mapper().writeValueAsString(message);
             System.out.println(message);
-            ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName, jsonString.getBytes(StandardCharsets.UTF_8));
+
+            long startTime = System.currentTimeMillis();
+            message.setProduceTime(startTime);
+            ProducerRecord<String, MyMessage> record = new ProducerRecord<>(topicName, message);
 
             int chunkNumber = i;
             fileProducer.send(record, (recordMetadata, e) -> {
@@ -82,14 +85,12 @@ public class ProducerDemo {
                     log.error("Chunk {} send failed ", chunkNumber, e);
                     if(callback != null) callback.onFail("Chunk " + chunkNumber + ": " + e.getMessage());
                 } else {
+                    long endTime = System.currentTimeMillis();
                     log.info("Chunk {} sent, offset: {}", chunkNumber, recordMetadata.offset());
-                    if(callback != null) callback.onSuccess(recordMetadata.offset());
+                    if(callback != null) callback.onSuccess(recordMetadata.offset(), (endTime - startTime));
                 }
             });
         }
-        long endTime= System.nanoTime();
-        produceSpeed.add((endTime - startTime)/1000000);
-        System.out.println("geçen süre:" + ((endTime - startTime)/1000000) + "ms");
     }
 
     public void close() {
@@ -98,7 +99,7 @@ public class ProducerDemo {
     }
 
     public interface AckCallback{
-        void onSuccess(long offset);
+        void onSuccess(long offset,long produceTime);
         void onFail(String error);
     }
 }

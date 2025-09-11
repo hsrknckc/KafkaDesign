@@ -20,6 +20,7 @@ public class MyMessage {
     private String dataPath;
     private int chunkNumber;
     private int totalChunk;
+    private long produceTime;
     public static final int chunkSize = 1024000;
 
 
@@ -153,6 +154,15 @@ public class MyMessage {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
+    }
+
+    @JsonProperty("produceTime")
+    public long getProduceTime() {
+        return produceTime;
+    }
+
+    public void setProduceTime(long produceTime) {
+        this.produceTime = produceTime;
     }
 
     @Override

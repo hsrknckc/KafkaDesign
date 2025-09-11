@@ -59,13 +59,13 @@ public class HelloController {
         String msg = message.getText();
         producerDemo.sendStringMessage(topic, msg, new ProducerDemo.AckCallback() {
             @Override
-            public void onSuccess(long offset) {
-                Platform.runLater(() -> stringObservableList.add("Başarıyla gönderildi! Offset: " + offset));
+            public void onSuccess(long offset,long produceTime) {
+                Platform.runLater(() -> stringObservableList.addFirst("Başarıyla gönderildi! Offset: " + offset + "; " + produceTime + " ms"));
             }
 
             @Override
             public void onFail(String error) {
-                Platform.runLater(() -> stringObservableList.add("Gönderilemedi: " + error));
+                Platform.runLater(() -> stringObservableList.addFirst("Gönderilemedi: " + error));
             }
         });
     }
@@ -78,12 +78,12 @@ public class HelloController {
         String path = fileToSend.getAbsolutePath();
         producerDemo.sendFileMessage(topic, path,  new ProducerDemo.AckCallback() {
             @Override
-            public void onSuccess(long offset) {
-                Platform.runLater(() -> fileObservableList.add("Chunk başarıyla gönderildi! Offset: " + offset));
+            public void onSuccess(long offset, long produceTime) {
+                Platform.runLater(() -> fileObservableList.addFirst("Chunk başarıyla gönderildi! Offset: " + offset + "; " + produceTime + " ms"));
             }
             @Override
             public void onFail(String error) {
-                Platform.runLater(() -> fileObservableList.add("Gönderilemedi: " + error));
+                Platform.runLater(() -> fileObservableList.addFirst("Gönderilemedi: " + error));
             }
         });
     }

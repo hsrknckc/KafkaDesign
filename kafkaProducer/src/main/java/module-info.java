@@ -8,6 +8,7 @@ module org.ismail.kafkaProducer {
     requires org.jetbrains.annotations;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
+    requires kafka.json.serializer;
     opens org.ismail.kafkaProducer.utils to com.fasterxml.jackson.databind;
 
     opens org.ismail.kafkaProducer to javafx.fxml;

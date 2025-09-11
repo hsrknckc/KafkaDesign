@@ -1,7 +1,7 @@
 package org.ismail.kafkaProducer.configs;
 
+import io.confluent.kafka.serializers.KafkaJsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.nio.file.Paths;
@@ -26,7 +26,7 @@ public class ProducerProperties {
 
         fileProperties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         fileProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        fileProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
+        fileProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSerializer.class.getName());
         fileProperties.setProperty("security.protocol", "SASL_SSL");
         fileProperties.setProperty("ssl.truststore.location",trustStorePath);
         fileProperties.setProperty("ssl.truststore.password", "123456");
