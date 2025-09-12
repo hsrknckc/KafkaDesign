@@ -13,7 +13,8 @@ import org.apache.kafka.common.resource.ResourcePattern;
 import org.apache.kafka.common.resource.ResourceType;
 import org.ismail.kafkamonitor.config.Props;
 
-import javax.management.*;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -24,8 +25,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class AdminOperations {
-    static Props props = new Props();
-    static AdminClient adminClient = AdminClient.create(props.properties);
+    private static final AdminClient adminClient = AdminClient.create(new Props().properties);
 
     private static long prevMessageCount = 0;
     private static long prevRequestCount = 0;
@@ -33,11 +33,8 @@ public class AdminOperations {
 
     public static Set<String> listTopics() throws ExecutionException, InterruptedException {
         ListTopicsResult listTopicsResult = adminClient.listTopics();
-        System.out.println(listTopicsResult.names().get());
-
-
         describeClusterInfo();
-        printConsumerLag("sasl-consumer");
+        printConsumerLag(Props.username);
         return listTopicsResult.names().get();
     }
 
@@ -55,7 +52,7 @@ public class AdminOperations {
             jmxc.close();
             return delta;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return 0;
         }
     }
@@ -74,7 +71,7 @@ public class AdminOperations {
             jmxc.close();
             return delta;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return 0;
         }
     }
@@ -198,7 +195,7 @@ public class AdminOperations {
             jmxc.close();
             return delta;
         }catch (Exception e){
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return 0;
         }
     }
@@ -214,7 +211,7 @@ public class AdminOperations {
             jmxc.close();
             return (Double)meanLatency;
         }catch (Exception e){
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return 0;
         }
     }
@@ -230,7 +227,7 @@ public class AdminOperations {
             jmxc.close();
             return (Double)recordsLag;
         }catch (Exception e){
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return 0;
         }
     }
@@ -245,7 +242,7 @@ public class AdminOperations {
         return memoryMXBean.getHeapMemoryUsage().getUsed();
     }
 
-    public static double getCpuUsage() throws IOException, ReflectionException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, MalformedObjectNameException {
+    public static double getCpuUsage() throws Exception {
         JMXServiceURL jmxServiceURL = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi");
         JMXConnector jmxc= JMXConnectorFactory.connect(jmxServiceURL,null);
         MBeanServerConnection mbs = jmxc.getMBeanServerConnection();

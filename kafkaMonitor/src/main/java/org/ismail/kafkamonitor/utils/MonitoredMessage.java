@@ -28,8 +28,6 @@ public class MonitoredMessage {
         this.consumerGroupsReadStatus = consumerGroupsReadStatus;
         this.producer = producer;
         this.produceTimeMs = produceTimeMs;
-//        if(textData != null) this.textData = textData;
-//        else this.textData = "!!!gösterilemeyen dosya!!!";
         this.textData = textData;
         this.dataType = "string";
         this.name = "str";
@@ -42,8 +40,6 @@ public class MonitoredMessage {
         this.consumerGroupsReadStatus = consumerGroupsReadStatus;
         this.producer = producer;
         this.produceTimeMs = produceTimeMs;
-//        if(textData != null) this.textData = textData;
-//        else this.textData = "!!!gösterilemeyen dosya!!!";
         this.data = data;
         this.dataType = dataType;
         this.name = name;
@@ -61,7 +57,6 @@ public class MonitoredMessage {
         }
     }
 
-    // Getter ve Setter’lar
     public String getTopic() { return topic; }
     public long getOffset() { return offset; }
     public LocalDateTime getTimestamp() { return timestamp; }

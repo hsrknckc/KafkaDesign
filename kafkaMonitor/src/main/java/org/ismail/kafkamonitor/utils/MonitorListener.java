@@ -1,6 +1,5 @@
 package org.ismail.kafkamonitor.utils;
 
-import org.slf4j.Logger;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
@@ -9,8 +8,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.ismail.kafkamonitor.config.Props;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class MonitorListener implements Runnable {
-
     private volatile boolean running = true;
-
-    private static final Props props = new Props();
     private final KafkaConsumer<String, MyMessage> consumer;
     private final AdminClient adminClient;
     private final String topic;
@@ -29,9 +25,9 @@ public class MonitorListener implements Runnable {
     private final Consumer<MonitoredMessage> callback;
 
     public MonitorListener(String topic, Consumer<MonitoredMessage> callback) {
-        this.adminClient = AdminClient.create(props.properties);
+        this.adminClient = AdminClient.create(new Props().properties);
         this.topic = topic;
-        this.consumer = new KafkaConsumer<>(props.monitorProperties);
+        this.consumer = new KafkaConsumer<>(new Props().monitorProperties);
         logger = LoggerFactory.getLogger(MonitorListener.class);
         this.callback = callback;
     }
@@ -41,12 +37,11 @@ public class MonitorListener implements Runnable {
         try{
             consumer.subscribe(Collections.singletonList(topic));
             while (running) {
-                ConsumerRecords<String, MyMessage> records = consumer.poll(java.time.Duration.ofMillis(500));
+                ConsumerRecords<String, MyMessage> records = consumer.poll(java.time.Duration.ofMillis(5000));
                 for (ConsumerRecord<String, MyMessage> record : records) {
                     try {
 
                         MyMessage msg = record.value();
-
                         Map<String, Boolean> readStatus = getConsumerGroupReadStatus(topic, record.offset());
                         MonitoredMessage monitoredMessage;
                         if(msg.getName().equals("str")) {

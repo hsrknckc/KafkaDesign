@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -20,8 +21,6 @@ import javafx.util.Duration;
 import org.ismail.kafkamonitor.utils.MonitorListener;
 import org.ismail.kafkamonitor.utils.MonitoredMessage;
 
-import javax.management.*;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +29,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HelloController {
-
     @FXML private ListView<String> topicListView;
     private final ObservableList<String> topicList = FXCollections.observableArrayList();
 
@@ -39,6 +37,7 @@ public class HelloController {
     @FXML private TextField aclCTopic, aclCUser, groupId;
     @FXML private ComboBox<String> permissionType;
     @FXML private Label status1;
+
     @FXML private LineChart<String, Number> messagesChart;
     private final XYChart.Series<String, Number> messagesSeries = new XYChart.Series<>();
     private final XYChart.Series<String, Number> consumeSeries = new XYChart.Series<>();
@@ -60,6 +59,8 @@ public class HelloController {
     @FXML private TableColumn<MonitoredMessage, String> dataColumn;
     @FXML private TableColumn<MonitoredMessage, String> produceTimeMsColumn;
 
+    private FilteredList<MonitoredMessage> filteredData;
+
     private final ObservableList<MonitoredMessage> monitorData = FXCollections.observableArrayList();
     private final AtomicReference<MonitorListener> currentListener = new AtomicReference<>();
 
@@ -69,13 +70,12 @@ public class HelloController {
     @FXML private TextArea clusterInfoArea;
     @FXML private TextArea brokerLatency;
 
-
     @FXML
     private void initialize() throws ExecutionException, InterruptedException {
         // PermissionType setup
         permissionType.getItems().addAll("Consumer", "Producer");
         permissionType.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if("Consumer".equals(newVal)){
+            if ("Consumer".equals(newVal)) {
                 groupId.setVisible(true);
                 groupId.setDisable(false);
             } else {
@@ -97,11 +97,9 @@ public class HelloController {
         messagesChart.setLegendVisible(false);
         messagesSeries.setName("Messages/sec");
 
-
         consumeChart.getData().add(consumeSeries);
         consumeChart.setLegendVisible(false);
         consumeSeries.setName("Avg Latency (ms)");
-
 
         memoryChart.getData().add(memorySeries);
         memoryChart.setLegendVisible(false);
@@ -121,11 +119,51 @@ public class HelloController {
         );
         dataColumn.setCellValueFactory(new PropertyValueFactory<>("dataType"));
         produceTimeMsColumn.setCellValueFactory(new PropertyValueFactory<>("produceTimeMs"));
-        messagesTable.setItems(monitorData);
+
+        // FilteredList setup
+        filteredData = new FilteredList<>(monitorData, p -> true);
+        messagesTable.setItems(filteredData);
+
+        // Producer filter
+        ComboBox<String> producerFilterBox = new ComboBox<>();
+        producerFilterBox.getItems().add("Tümü");
+        producerFilterBox.setValue("Tümü");
+        producerFilterBox.setMaxWidth(50);
+        producerColumn.setGraphic(producerFilterBox);
+
+        // Consumer filter
+        ComboBox<String> consumerFilterBox = new ComboBox<>();
+        consumerFilterBox.getItems().add("Tümü");
+        consumerFilterBox.setValue("Tümü");
+        consumerFilterBox.setMaxWidth(50);
+        readStatusColumn.setGraphic(consumerFilterBox);
+
+        // Filter listener
+        producerFilterBox.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters(producerFilterBox, consumerFilterBox));
+        consumerFilterBox.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters(producerFilterBox, consumerFilterBox));
+
+        // Dinamik olarak producer ve consumer ekleme
+        monitorData.addListener((javafx.collections.ListChangeListener<MonitoredMessage>) change -> {
+            for (MonitoredMessage msg : monitorData) {
+                // Producer
+                if (msg.getProducer() != null && !msg.getProducer().isBlank() &&
+                        !producerFilterBox.getItems().contains(msg.getProducer())) {
+                    producerFilterBox.getItems().add(msg.getProducer());
+                }
+                // Consumer
+                for (String consumer : msg.getConsumerGroupsReadStatus().keySet()) {
+                    if (!consumerFilterBox.getItems().contains(consumer)) {
+                        consumerFilterBox.getItems().add(consumer);
+                    }
+                }
+            }
+        });
+
+        // Satır çift tıklama
         messagesTable.setRowFactory(tv -> {
             TableRow<MonitoredMessage> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if(!row.isEmpty() && event.getClickCount() == 2){
+                if (!row.isEmpty() && event.getClickCount() == 2) {
                     MonitoredMessage msg = row.getItem();
 
                     Stage dialog = new Stage();
@@ -139,10 +177,8 @@ public class HelloController {
                     textArea.setEditable(false);
                     textArea.setWrapText(true);
 
-
                     String sb;
-                    if(msg.getName().equals("str")){
-                        // Mesaj bilgisini oluştur
+                    if ("str".equals(msg.getName())) {
                         sb = "File Name: " + msg.getName() + "\n" +
                                 "Chunk: " + msg.getChunkNumber() + "/" + msg.getTotalChunk() + "\n" +
                                 "Timestamp: " + msg.getTimestamp() + "\n" +
@@ -150,9 +186,7 @@ public class HelloController {
                                 "Producer: " + msg.getProducer() + "\n" +
                                 "Message type: " + msg.getDataType() + "\n" +
                                 "Text data: " + msg.getTextData() + "\n";
-                        // İstersen diğer alanları da ekleyebilirsin
-                    }else{
-                        // Mesaj bilgisini oluştur
+                    } else {
                         sb = "File Name: " + msg.getName() + "\n" +
                                 "Chunk: " + msg.getChunkNumber() + "/" + msg.getTotalChunk() + "\n" +
                                 "Timestamp: " + msg.getTimestamp() + "\n" +
@@ -160,12 +194,11 @@ public class HelloController {
                                 "Producer: " + msg.getProducer() + "\n" +
                                 "Message type: " + msg.getDataType() + "\n" +
                                 "Byte Length: " + msg.getData().length + "\n";
-                        // İstersen diğer alanları da ekleyebilirsin
                     }
 
                     textArea.setText(sb);
-
                     vbox.getChildren().add(textArea);
+
                     Scene scene = new Scene(vbox, 400, 300);
                     dialog.setScene(scene);
                     dialog.show();
@@ -174,12 +207,24 @@ public class HelloController {
             return row;
         });
 
+        // Timeline ile sürekli yenileme
         Timeline refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             refreshTable();
             updateMetrics();
         }));
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
         refreshTimeline.play();
+    }
+
+    private void applyFilters(ComboBox<String> producerFilterBox, ComboBox<String> consumerFilterBox) {
+        String selectedProducer = producerFilterBox.getValue();
+        String selectedConsumer = consumerFilterBox.getValue();
+
+        filteredData.setPredicate(msg -> {
+            boolean producerMatch = "Tümü".equals(selectedProducer) || selectedProducer.equals(msg.getProducer());
+            boolean consumerMatch = "Tümü".equals(selectedConsumer) || msg.getConsumerGroupsReadStatus().containsKey(selectedConsumer);
+            return producerMatch && consumerMatch;
+        });
     }
 
     @FXML
@@ -197,16 +242,14 @@ public class HelloController {
             for (MonitoredMessage monitoredMessage : monitorData) {
                 try {
                     monitoredMessage.updateReadStatus(currentListener.get());
-                }catch (Exception e){
-                    //System.err.println(e.getMessage());
-                }
+                } catch (Exception ignored) {}
             }
             messagesTable.refresh();
         });
     }
 
-    private void updateMetrics(){
-        Platform.runLater(()->{
+    private void updateMetrics() {
+        Platform.runLater(() -> {
             String timeLabel = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
             long messages = AdminOperations.producerSpeed();
@@ -214,18 +257,16 @@ public class HelloController {
             double latency = AdminOperations.getBrokerRequestLatencyMs();
             DecimalFormat df = new DecimalFormat("#.##");
 
-            long memoryUsage = -1;
-            double cpuUsage = -1;
+            long memoryUsage;
+            double cpuUsage;
             try {
                 memoryUsage = AdminOperations.getMemoryUsage();
                 cpuUsage = AdminOperations.getCpuUsage();
-
-            } catch (IOException | MBeanException | InstanceNotFoundException | MalformedObjectNameException |
-                     AttributeNotFoundException | ReflectionException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
-            memorySeries.getData().add(new XYChart.Data<>(timeLabel, memoryUsage/1024000));
+            memorySeries.getData().add(new XYChart.Data<>(timeLabel, memoryUsage / 1024000));
             cpuSeries.getData().add(new XYChart.Data<>(timeLabel, cpuUsage));
 
             brokerLatency.setText("Broker gecikmesi: " + df.format(latency) + " ms");
@@ -233,27 +274,23 @@ public class HelloController {
             messagesSeries.getData().add(new XYChart.Data<>(timeLabel, messages));
             consumeSeries.getData().add(new XYChart.Data<>(timeLabel, consumedBytes));
 
-            // Limit chart points to last 30 entries
             if (messagesSeries.getData().size() > 30) messagesSeries.getData().removeFirst();
             if (consumeSeries.getData().size() > 30) consumeSeries.getData().removeFirst();
-            if(memorySeries.getData().size() > 30) memorySeries.getData().removeFirst();
-
+            if (memorySeries.getData().size() > 30) memorySeries.getData().removeFirst();
         });
     }
 
-    public void stopMonitor(){
+    public void stopMonitor() {
         MonitorListener listener = currentListener.get();
-        if(listener != null){
-            listener.stop();
-        }
+        if (listener != null) listener.stop();
     }
 
     private void startMonitorListener(String topic) {
-        // Yeni listener callback ile kuruluyor
-        MonitorListener listener = new MonitorListener(topic, msg -> Platform.runLater(() -> monitorData.addFirst(msg)));
-
+        MonitorListener listener = new MonitorListener(topic, msg -> Platform.runLater(() -> {
+            monitorData.addFirst(msg);
+            if (monitorData.size() > 100) monitorData.removeLast();
+        }));
         currentListener.set(listener);
-
         Thread t = new Thread(listener);
         t.setDaemon(true);
         t.start();
@@ -286,9 +323,9 @@ public class HelloController {
     @FXML
     protected void createAcls() {
         String perm = permissionType.getSelectionModel().getSelectedItem();
-        if("Producer".equals(perm)){
+        if ("Producer".equals(perm)) {
             AdminOperations.createAcls(aclCTopic.getText(), aclCUser.getText());
-        } else if("Consumer".equals(perm)){
+        } else if ("Consumer".equals(perm)) {
             AdminOperations.createAcls(aclCTopic.getText(), aclCUser.getText(), groupId.getText());
         }
     }

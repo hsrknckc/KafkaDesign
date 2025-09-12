@@ -54,7 +54,7 @@
                   <CategoryAxis label=" " />
                </xAxis>
                <yAxis>
-                  <NumberAxis label="MB"/>
+                  <NumberAxis label="MB" />
                </yAxis>
             </LineChart>
          </VBox>
@@ -82,7 +82,7 @@
                   <CategoryAxis label=" " />
                </xAxis>
                <yAxis>
-                  <NumberAxis label=" % "/>
+                  <NumberAxis label=" % " />
                </yAxis>
             </LineChart>
          </VBox>
@@ -144,13 +144,13 @@
             <Label text="Producer Monitor" />
             <TableView fx:id="messagesTable" VBox.vgrow="ALWAYS">
                <columns>
-                  <TableColumn fx:id="offsetColumn" prefWidth="70" text="Offset" />
-                  <TableColumn fx:id="producerColumn" prefWidth="100" text="Producer" />
-                  <TableColumn fx:id="timeColumn" prefWidth="142.00003051757812" text="Zaman" />
-                  <TableColumn fx:id="topicColumn" prefWidth="127.0" text="Topic" />
+                  <TableColumn fx:id="offsetColumn" prefWidth="56.39999008178711" text="Offset" />
+                  <TableColumn fx:id="producerColumn" prefWidth="137.8000030517578" text="Producer" />
+                  <TableColumn fx:id="timeColumn" prefWidth="139.00001525878906" text="Zaman" />
+                  <TableColumn fx:id="topicColumn" prefWidth="108.20001220703125" text="Topic" />
                   <TableColumn fx:id="readStatusColumn" prefWidth="158.79998779296875" text="Okundu" />
-                  <TableColumn fx:id="dataColumn" prefWidth="139.0" text="Mesaj" />
-                  <TableColumn fx:id="produceTimeMsColumn" prefWidth="182.5999755859375" text="Produce süresi(ms)" />
+                  <TableColumn fx:id="dataColumn" prefWidth="193.20001220703125" text="Mesaj" />
+                  <TableColumn fx:id="produceTimeMsColumn" prefWidth="129.20001220703125" text="Produce süresi(ms)" />
                </columns>
             </TableView>
             <HBox spacing="10">
