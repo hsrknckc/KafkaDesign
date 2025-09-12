@@ -28,7 +28,7 @@ public class ProducerDemo {
         long startTime = System.currentTimeMillis();
         message.setProduceTime(startTime);
         ProducerRecord<String, MyMessage> record = new ProducerRecord<>(topicName, message);
-        fileProducer.send(record, (recordMetadata, e) -> {
+        fileProducer.send(record, (recordMetadata,e) -> {
             if (e != null) {
                 log.error("Send failed", e);
                 if(callback != null) callback.onFail(e.getMessage());
