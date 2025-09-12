@@ -1,2 +1,11 @@
 k/data
 k/logs
+
+kafkaConsumer/.idea
+kafkaConsumer/.mvn
+
+kafkaProducer/.idea
+kafkaProducer/.mvn
+
+kafkaMonitor/.idea
+kafkaMonitor/.mvn
