@@ -14,31 +14,21 @@ import java.io.File;
 import java.io.IOException;
 
 public class HelloController {
-    @FXML
-    private TextField topicName;
-    @FXML
-    private TextField topicName2;
-    @FXML
-    private TextField message;
-    @FXML
-    private ComboBox<String> topicBox;
-    @FXML
-    private ComboBox<String> topicBox2;
-    @FXML
-    private ListView<String> stringList;
-    @FXML
-    private ListView<String> fileList;
-
-
-    private final FileChooser fileChooser = new FileChooser();
-
     private final ProducerDemo producerDemo = new ProducerDemo();
 
-
+    @FXML private TextField topicName;
+    @FXML private TextField message;
+    @FXML private ComboBox<String> topicBox;
+    @FXML private ListView<String> stringList;
     private final ObservableList<String> stringObservableList = FXCollections.observableArrayList();
+
+    @FXML private TextField topicName2;
+    @FXML private ComboBox<String> topicBox2;
+    @FXML private ListView<String> fileList;
+    private File fileToSend;
     private final ObservableList<String> fileObservableList = FXCollections.observableArrayList();
 
-
+    private final FileChooser fileChooser = new FileChooser();
 
     @FXML
     public void initialize() {
@@ -52,15 +42,14 @@ public class HelloController {
         fileList.setItems(fileObservableList);
     }
 
-
     @FXML
     protected void sendString() throws JsonProcessingException {
         String topic = topicName.getText().trim();
         String msg = message.getText();
         producerDemo.sendStringMessage(topic, msg, new ProducerDemo.AckCallback() {
             @Override
-            public void onSuccess(long offset,long produceTime) {
-                Platform.runLater(() -> stringObservableList.addFirst("Başarıyla gönderildi! Offset: " + offset + "; " + produceTime + " ms"));
+            public void onSuccess(long offset) {
+                Platform.runLater(() -> stringObservableList.addFirst("Başarıyla gönderildi! Offset: " + offset));
             }
 
             @Override
@@ -70,16 +59,14 @@ public class HelloController {
         });
     }
 
-    File fileToSend;
-
     @FXML
     protected void sendFile() throws IOException {
         String topic = topicName2.getText().trim();
         String path = fileToSend.getAbsolutePath();
         producerDemo.sendFileMessage(topic, path,  new ProducerDemo.AckCallback() {
             @Override
-            public void onSuccess(long offset, long produceTime) {
-                Platform.runLater(() -> fileObservableList.addFirst("Chunk başarıyla gönderildi! Offset: " + offset + "; " + produceTime + " ms"));
+            public void onSuccess(long offset) {
+                Platform.runLater(() -> fileObservableList.addFirst("Chunk başarıyla gönderildi! Offset: " + offset));
             }
             @Override
             public void onFail(String error) {
@@ -92,5 +79,4 @@ public class HelloController {
     protected void selectFile() {
         fileToSend = fileChooser.showOpenDialog(null);
     }
-
 }
