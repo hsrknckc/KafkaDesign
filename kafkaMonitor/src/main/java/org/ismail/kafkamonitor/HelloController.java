@@ -58,6 +58,8 @@ public class HelloController {
     @FXML private TableColumn<MonitoredMessage, String> readStatusColumn;
     @FXML private TableColumn<MonitoredMessage, String> dataColumn;
     @FXML private TableColumn<MonitoredMessage, String> produceTimeMsColumn;
+    @FXML private TableColumn<MonitoredMessage, Integer> partitionColumn;
+
 
     private FilteredList<MonitoredMessage> filteredData;
 
@@ -119,6 +121,7 @@ public class HelloController {
         );
         dataColumn.setCellValueFactory(new PropertyValueFactory<>("dataType"));
         produceTimeMsColumn.setCellValueFactory(new PropertyValueFactory<>("produceTimeMs"));
+        partitionColumn.setCellValueFactory(new PropertyValueFactory<>("partition"));
 
         // FilteredList setup
         filteredData = new FilteredList<>(monitorData, p -> true);
@@ -180,17 +183,18 @@ public class HelloController {
                     String sb;
                     if ("str".equals(msg.getName())) {
                         sb = "File Name: " + msg.getName() + "\n" +
-                                "Chunk: " + msg.getChunkNumber() + "/" + msg.getTotalChunk() + "\n" +
                                 "Timestamp: " + msg.getTimestamp() + "\n" +
                                 "Topic: " + msg.getTopic() + "\n" +
+                                "Partition: " + msg.getPartition() + "\n" +
                                 "Producer: " + msg.getProducer() + "\n" +
                                 "Message type: " + msg.getDataType() + "\n" +
                                 "Text data: " + msg.getTextData() + "\n";
                     } else {
                         sb = "File Name: " + msg.getName() + "\n" +
-                                "Chunk: " + msg.getChunkNumber() + "/" + msg.getTotalChunk() + "\n" +
+                                "Chunk: " + (msg.getChunkNumber() + 1) + "/" + msg.getTotalChunk() + "\n" +
                                 "Timestamp: " + msg.getTimestamp() + "\n" +
                                 "Topic: " + msg.getTopic() + "\n" +
+                                "Partition: " + msg.getPartition() + "\n" +
                                 "Producer: " + msg.getProducer() + "\n" +
                                 "Message type: " + msg.getDataType() + "\n" +
                                 "Byte Length: " + msg.getData().length + "\n";

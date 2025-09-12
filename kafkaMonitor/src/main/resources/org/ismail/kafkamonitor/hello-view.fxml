@@ -144,13 +144,14 @@
             <Label text="Producer Monitor" />
             <TableView fx:id="messagesTable" VBox.vgrow="ALWAYS">
                <columns>
+                  <TableColumn fx:id="topicColumn" prefWidth="108.20001220703125" text="Topic" />
+                  <TableColumn fx:id="partitionColumn" prefWidth="56.39999008178711" text="Partition" />
                   <TableColumn fx:id="offsetColumn" prefWidth="56.39999008178711" text="Offset" />
                   <TableColumn fx:id="producerColumn" prefWidth="137.8000030517578" text="Producer" />
                   <TableColumn fx:id="timeColumn" prefWidth="139.00001525878906" text="Zaman" />
-                  <TableColumn fx:id="topicColumn" prefWidth="108.20001220703125" text="Topic" />
                   <TableColumn fx:id="readStatusColumn" prefWidth="158.79998779296875" text="Okundu" />
-                  <TableColumn fx:id="dataColumn" prefWidth="193.20001220703125" text="Mesaj" />
-                  <TableColumn fx:id="produceTimeMsColumn" prefWidth="129.20001220703125" text="Produce süresi(ms)" />
+                  <TableColumn fx:id="dataColumn" prefWidth="116.60003662109375" text="Mesaj tipi" />
+                  <TableColumn fx:id="produceTimeMsColumn" prefWidth="135.800048828125" text="Prod. süresi(ms)" />
                </columns>
             </TableView>
             <HBox spacing="10">

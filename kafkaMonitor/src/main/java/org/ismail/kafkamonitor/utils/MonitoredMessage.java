@@ -20,9 +20,11 @@ public class MonitoredMessage {
     private int chunkNumber;
     private int totalChunk;
     public static final int chunkSize= 1024000;
+    private int partition;
 
-    public MonitoredMessage(String topic, long offset, String producer, LocalDateTime timestamp, String textData, Map<String, Boolean> consumerGroupsReadStatus, long produceTimeMs) {
+    public MonitoredMessage(String topic, int partition, long offset, String producer, LocalDateTime timestamp, String textData, Map<String, Boolean> consumerGroupsReadStatus, long produceTimeMs) {
         this.topic = topic;
+        this.partition = partition;
         this.offset = offset;
         this.timestamp = timestamp;
         this.consumerGroupsReadStatus = consumerGroupsReadStatus;
@@ -33,8 +35,9 @@ public class MonitoredMessage {
         this.name = "str";
     }
 
-    public MonitoredMessage(String name,String topic, long offset, String producer, LocalDateTime timestamp, String dataType, byte[] data,String fileId ,Map<String, Boolean> consumerGroupsReadStatus, long produceTimeMs,int chunkNumber,int totalChunk) {
+    public MonitoredMessage(String name,String topic, int partition, long offset, String producer, LocalDateTime timestamp, String dataType, byte[] data,String fileId ,Map<String, Boolean> consumerGroupsReadStatus, long produceTimeMs,int chunkNumber,int totalChunk) {
         this.topic = topic;
+        this.partition = partition;
         this.offset = offset;
         this.timestamp = timestamp;
         this.consumerGroupsReadStatus = consumerGroupsReadStatus;
@@ -78,5 +81,7 @@ public class MonitoredMessage {
     public void setDataType(String dataType) { this.dataType = dataType; }
     public String getFileId() { return fileId; }
     public void setFileId(String fileId) { this.fileId = fileId; }
+    public int getPartition() { return partition; }
+    public void setPartition(int partition) { this.partition = partition; }
 }
 

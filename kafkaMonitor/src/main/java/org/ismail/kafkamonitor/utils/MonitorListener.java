@@ -40,13 +40,13 @@ public class MonitorListener implements Runnable {
                 ConsumerRecords<String, MyMessage> records = consumer.poll(java.time.Duration.ofMillis(5000));
                 for (ConsumerRecord<String, MyMessage> record : records) {
                     try {
-
                         MyMessage msg = record.value();
                         Map<String, Boolean> readStatus = getConsumerGroupReadStatus(topic, record.offset());
                         MonitoredMessage monitoredMessage;
                         if(msg.getName().equals("str")) {
                             monitoredMessage = new MonitoredMessage(
                                     topic,
+                                    record.partition(),
                                     record.offset(),
                                     msg.getProducer(),
                                     msg.getTime(),
@@ -58,6 +58,7 @@ public class MonitorListener implements Runnable {
                             monitoredMessage = new MonitoredMessage(
                                     msg.getName(),
                                     topic,
+                                    record.partition(),
                                     record.offset(),
                                     msg.getProducer(),
                                     msg.getTime(),
