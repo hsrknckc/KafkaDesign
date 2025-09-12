@@ -13,16 +13,13 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-
         HelloController controller = fxmlLoader.getController();
         controller.setHostServices(getHostServices());
-
         stage.setTitle("Kafka Consumer Client");
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> {
             try {
                 controller.shutdown();
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

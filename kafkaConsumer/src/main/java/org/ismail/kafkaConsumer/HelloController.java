@@ -24,20 +24,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HelloController {
-    @FXML
-    private TextField topic;
-    @FXML
-    private ListView<VBox> fileArea;
-    @FXML
-    private Label status;
-    @FXML
-    private ComboBox<String> topicBox;
+    @FXML private TextField topic;
+    @FXML private ListView<VBox> fileArea;
+    @FXML private Label status;
+    @FXML private ComboBox<String> topicBox;
     final ObservableList<VBox> messages = FXCollections.observableArrayList();
     private String topicName;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(HelloController.class);
-
     private BasicHttpServer server;
 
     @FXML
@@ -64,15 +59,9 @@ public class HelloController {
 
     private HostServices hostServices;
 
-    public void setHostServices(HostServices hostServices) {
-        this.hostServices = hostServices;
-    }
+    public void setHostServices(HostServices hostServices) { this.hostServices = hostServices; }
 
-    private void openInBrowser(String filePath) {
-        if (hostServices != null) {
-            hostServices.showDocument(filePath);
-        }
-    }
+    private void openInBrowser(String filePath) { if (hostServices != null) { hostServices.showDocument(filePath); } }
 
     private final AtomicReference<TopicListener> currentListener = new AtomicReference<>();
 
@@ -108,7 +97,6 @@ public class HelloController {
                 String url = "http://localhost:8080/" + message.getName();
                 downloadButton.setOnAction(event -> openInBrowser(url));
                 tekMsg.getChildren().add(downloadButton);
-
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
