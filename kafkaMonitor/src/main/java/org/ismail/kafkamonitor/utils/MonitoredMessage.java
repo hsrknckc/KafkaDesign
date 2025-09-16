@@ -54,7 +54,7 @@ public class MonitoredMessage {
 
     public void updateReadStatus(MonitorListener listener){
         try{
-            this.consumerGroupsReadStatus = listener.getConsumerGroupReadStatus(getTopic(),getOffset());
+            this.consumerGroupsReadStatus = listener.getConsumerGroupReadStatus(getTopic(),getPartition(),getOffset());
         }catch (Exception e){
             System.err.println("Error while updating read status : " + e.getMessage());
         }

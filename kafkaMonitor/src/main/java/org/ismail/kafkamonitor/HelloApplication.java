@@ -7,10 +7,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.BootstrapFX;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 public class HelloApplication extends Application {
     private HelloController helloController;
+    Random random = new Random();
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -21,6 +24,9 @@ public class HelloApplication extends Application {
         stage.setTitle("Kafka Monitor");
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> {
+            File file = new File("monitor.log");
+            long num = random.nextLong();
+            file.renameTo(new File("monitor" + num + ".log"));
             Platform.exit();
             System.exit(0);
         });

@@ -60,7 +60,6 @@ public class HelloController {
     @FXML private TableColumn<MonitoredMessage, String> produceTimeMsColumn;
     @FXML private TableColumn<MonitoredMessage, Integer> partitionColumn;
 
-
     private FilteredList<MonitoredMessage> filteredData;
 
     private final ObservableList<MonitoredMessage> monitorData = FXCollections.observableArrayList();
@@ -212,7 +211,7 @@ public class HelloController {
         });
 
         // Timeline ile sürekli yenileme
-        Timeline refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+        Timeline refreshTimeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> {
             refreshTable();
             updateMetrics();
         }));
@@ -226,7 +225,11 @@ public class HelloController {
 
         filteredData.setPredicate(msg -> {
             boolean producerMatch = "Tümü".equals(selectedProducer) || selectedProducer.equals(msg.getProducer());
-            boolean consumerMatch = "Tümü".equals(selectedConsumer) || msg.getConsumerGroupsReadStatus().containsKey(selectedConsumer);
+            boolean consumerMatch = true; // default
+            if (!"Tümü".equals(selectedConsumer)) {
+                Boolean hasRead = msg.getConsumerGroupsReadStatus().get(selectedConsumer);
+                consumerMatch = hasRead != null && hasRead; // sadece okuyanlar gelsin
+            }
             return producerMatch && consumerMatch;
         });
     }

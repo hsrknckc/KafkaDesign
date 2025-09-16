@@ -6,7 +6,6 @@ import org.ismail.kafkaProducer.configs.ProducerProperties;
 import org.ismail.kafkaProducer.utils.MyMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +13,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.UUID;
-
 import static org.ismail.kafkaProducer.utils.Utilities.getFileType;
 
 public class ProducerDemo {

@@ -9,6 +9,7 @@ module org.ismail.kafkamonitor {
     requires java.management;
     requires org.slf4j;
     requires kafka.json.serializer;
+    requires org.json;
 
     opens org.ismail.kafkamonitor to javafx.fxml;
     exports org.ismail.kafkamonitor;

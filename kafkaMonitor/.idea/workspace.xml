@@ -5,12 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d97d70b-a070-4181-8955-a0d213122320" name="Changes" comment="code refacor">
-      <change beforePath="$PROJECT_DIR$/../k/config/server-0.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../k/config/server-0.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/configs/ConsumerProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaConsumer/src/main/java/org/ismail/kafkaConsumer/configs/ConsumerProperties.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/HelloController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitorListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitorListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitoredMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/ismail/kafkamonitor/utils/MonitoredMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/org/ismail/kafkamonitor/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/org/ismail/kafkamonitor/hello-view.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/ProducerDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaProducer/src/main/java/org/ismail/kafkaProducer/ProducerDemo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../kafkaServerStarter/users.db" beforeDir="false" afterPath="$PROJECT_DIR$/../kafkaServerStarter/users.db" afterDir="false" />
     </list>
@@ -141,7 +143,10 @@
       <workItem from="1757568388413" duration="9558000" />
       <workItem from="1757583968154" duration="10940000" />
       <workItem from="1757654566774" duration="9310000" />
-      <workItem from="1757674543303" duration="617000" />
+      <workItem from="1757674543303" duration="1046000" />
+      <workItem from="1757681641771" duration="113000" />
+      <workItem from="1757915337976" duration="12257000" />
+      <workItem from="1758003827091" duration="3623000" />
     </task>
     <task id="LOCAL-00001" summary="monitor eklendi">
       <option name="closed" value="true" />

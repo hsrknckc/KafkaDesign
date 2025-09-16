@@ -11,14 +11,14 @@ public class ConsumerProperties {
     public final Properties fileProperties = new Properties();
     public final String path = Paths.get(System.getProperty("user.dir"), "..", "k", "ssl").toAbsolutePath().toString();
     public final String trustStorePath = Paths.get(path, "kafka.consumer.truststore.jks").toString();
-    public static final String username = "sasl-consumer";
+    public static final String username = "dnme-consumer";
     public static final String password = "Bro1234";
 
     public ConsumerProperties() {
         fileProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         fileProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         fileProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaJsonDeserializer.class.getName());
-        fileProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "sasl-consumer");
+        fileProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "dnme-consumer");
         fileProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         fileProperties.setProperty("security.protocol", "SASL_SSL");
         fileProperties.setProperty("sasl.mechanism", "SCRAM-SHA-512");

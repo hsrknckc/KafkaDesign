@@ -1,15 +1,24 @@
 package org.ismail.kafkamonitor.utils;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.ismail.kafkamonitor.config.Props;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +50,7 @@ public class MonitorListener implements Runnable {
                 for (ConsumerRecord<String, MyMessage> record : records) {
                     try {
                         MyMessage msg = record.value();
-                        Map<String, Boolean> readStatus = getConsumerGroupReadStatus(topic, record.offset());
+                        Map<String, Boolean> readStatus = getConsumerGroupReadStatus(record.topic(),record.partition(),record.offset());
                         MonitoredMessage monitoredMessage;
                         if(msg.getName().equals("str")) {
                             monitoredMessage = new MonitoredMessage(
@@ -72,6 +81,7 @@ public class MonitorListener implements Runnable {
                             );
                         }
                         callback.accept(monitoredMessage);
+                        logToFile(monitoredMessage);
 
                     } catch (Exception e) {
                         logger.error(e.getMessage());
@@ -89,23 +99,46 @@ public class MonitorListener implements Runnable {
         consumer.wakeup();
     }
 
-    public Map<String, Boolean> getConsumerGroupReadStatus(String topic, long offset) throws ExecutionException, InterruptedException {
+    private void logToFile(MonitoredMessage msg) {
+        JSONObject json = new JSONObject();
+        json.put("topic", msg.getTopic());
+        json.put("partition", msg.getPartition());
+        json.put("offset", msg.getOffset());
+        json.put("producer", msg.getProducer());
+        json.put("textData", msg.getTextData());
+        json.put("dataType", msg.getDataType());
+        json.put("readStatus", msg.getConsumerGroupsReadStatus());
+        json.put("prodTimeMs", msg.getProduceTimeMs());
+        json.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        String logFile = "monitor.log";
+        try (PrintWriter out = new PrintWriter(new FileWriter(logFile, true))) {
+            out.println(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public Map<String, Boolean> getConsumerGroupReadStatus(String topic ,int partition, long offset) throws ExecutionException, InterruptedException {
         Map<String, Boolean> status = new HashMap<>();
         ListConsumerGroupsResult groupsResult = adminClient.listConsumerGroups();
+
+        TopicPartition tp = new TopicPartition(topic, partition);
 
         for (var groupListing : groupsResult.all().get()) {
             String groupId = groupListing.groupId();
             if (groupId.equals("monitor-consumer-group")) continue;
+
             ListConsumerGroupOffsetsResult offsetsResult = adminClient.listConsumerGroupOffsets(groupId);
             var offsets = offsetsResult.partitionsToOffsetAndMetadata().get();
 
-            var tp = new org.apache.kafka.common.TopicPartition(topic, 0); // partition 0 için örnek
-            if (offsets.containsKey(tp)) {
+            boolean hasRead= false;
+            if(offsets.containsKey(tp)){
                 long committed = offsets.get(tp).offset();
-                status.put(groupId, committed > offset);
-            } else {
-                status.put(groupId, false);
+                hasRead = committed > offset;
             }
+            status.put(groupId, hasRead);
         }
         return status;
     }
