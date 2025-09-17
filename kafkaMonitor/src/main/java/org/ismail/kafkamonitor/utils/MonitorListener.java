@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -99,6 +100,7 @@ public class MonitorListener implements Runnable {
         consumer.wakeup();
     }
 
+    static long time = System.currentTimeMillis();
     private void logToFile(MonitoredMessage msg) {
         JSONObject json = new JSONObject();
         json.put("topic", msg.getTopic());
@@ -111,7 +113,13 @@ public class MonitorListener implements Runnable {
         json.put("prodTimeMs", msg.getProduceTimeMs());
         json.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
-        String logFile = "monitor.log";
+        String logFile = "monitor_" + time + ".log";
+        File file = new File(logFile);
+        long size=file.length();
+        if(size>1024*1024){
+            time = System.currentTimeMillis();
+            logFile = "monitor_" + time + ".log";
+        }
         try (PrintWriter out = new PrintWriter(new FileWriter(logFile, true))) {
             out.println(json);
         } catch (IOException e) {

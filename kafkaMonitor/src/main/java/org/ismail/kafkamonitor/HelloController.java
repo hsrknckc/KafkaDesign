@@ -186,6 +186,7 @@ public class HelloController {
                                 "Topic: " + msg.getTopic() + "\n" +
                                 "Partition: " + msg.getPartition() + "\n" +
                                 "Producer: " + msg.getProducer() + "\n" +
+                                "Consumer(s): " + msg.getConsumerGroupsReadStatus() + "\n" +
                                 "Message type: " + msg.getDataType() + "\n" +
                                 "Text data: " + msg.getTextData() + "\n";
                     } else {
@@ -295,7 +296,7 @@ public class HelloController {
     private void startMonitorListener(String topic) {
         MonitorListener listener = new MonitorListener(topic, msg -> Platform.runLater(() -> {
             monitorData.addFirst(msg);
-            if (monitorData.size() > 100) monitorData.removeLast();
+            //if (monitorData.size() > 100) monitorData.removeLast();
         }));
         currentListener.set(listener);
         Thread t = new Thread(listener);

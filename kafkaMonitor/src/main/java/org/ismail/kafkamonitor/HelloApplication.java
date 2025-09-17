@@ -24,9 +24,6 @@ public class HelloApplication extends Application {
         stage.setTitle("Kafka Monitor");
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> {
-            File file = new File("monitor.log");
-            long num = random.nextLong();
-            file.renameTo(new File("monitor" + num + ".log"));
             Platform.exit();
             System.exit(0);
         });
