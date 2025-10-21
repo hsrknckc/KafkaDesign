@@ -28,6 +28,8 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
+  //test
+
   // Load the index.html of the app.
   win.loadFile("index.html");
 
